@@ -3,6 +3,7 @@ import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import {AUTH, PHONE_VERIFICATION} from '@whenly/constants';
 import {joinWithSlash} from '@whenly/utils/string';
 import {
+  getActivityList,
   getCurrentUser,
   getRequestAccountDeletion,
   postFacebookLogin,
@@ -296,6 +297,20 @@ const logout = createAsyncThunk(joinWithSlash(AUTH, 'logout'), async () => {
   }
 });
 
+// for getting Activities
+const getActivityListApi = createAsyncThunk(
+  joinWithSlash(AUTH, 'getActivityListApi'),
+  async () => {
+    try {
+      const response = await getActivityList();
+      console.log('getActivities', JSON.stringify(response));
+      return response?.data?.data?.docs;
+    } catch (error) {
+      console.log('Error', error);
+    }
+  },
+);
+
 const initialState: AuthState = {
   user: null,
   loading: false,
@@ -440,6 +455,18 @@ const {actions, reducer} = createSlice({
       state.loading = false;
       state.error = payload;
     },
+    [getActivityListApi.pending.type]: (state) => {
+      state.loading = true;
+      state.error = '';
+    },
+    [getActivityListApi.fulfilled.type]: (state) => {
+      state.loading = false;
+      state.error = '';
+    },
+    [getActivityListApi.rejected.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = payload;
+    },
   },
 });
 
@@ -456,6 +483,7 @@ export const authActions = {
   register,
   requestAccountDeletion,
   updateFavorites,
+  getActivityListApi,
 };
 
 export default reducer;

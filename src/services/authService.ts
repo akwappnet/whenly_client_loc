@@ -2,7 +2,8 @@ import axios from '@whenly/utils/axios-local';
 import {User} from 'redux';
 
 export const getCurrentUser = () => axios.get('/v1/auth');
-export const getRequestAccountDeletion = () => axios.get('/v1/auth/request-account-deletion');
+export const getRequestAccountDeletion = () =>
+  axios.get('/v1/auth/request-account-deletion');
 
 export const postLogin = (email: string, password: string) =>
   axios.post('/v1/auth/login', {email, password});
@@ -23,3 +24,5 @@ export const postSendOTP = (phoneNumber: string) => {
 };
 export const postVerifyOTP = (code: string) =>
   axios.post(`/v1/auth/verify-otp?code=${code}`);
+
+export const getActivityList = () => axios.get(`/v1/activity`);
