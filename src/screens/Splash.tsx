@@ -36,11 +36,13 @@ const Splash = () => {
   useEffect(() => {
     if (!loading) {
       if (user) {
-        if (user.isPhoneVerified) {
-          navigation.navigate(MAIN_STACK);
-        } else {
-          navigation.navigate(PHONE_VERIFICATION);
-        }
+        //TODO uncomment following code before release the apk//
+        navigation.navigate(MAIN_STACK);
+        // if (user.isPhoneVerified) {
+        //   navigation.navigate(MAIN_STACK);
+        // } else {
+        //   navigation.navigate(PHONE_VERIFICATION);
+        // }
       } else {
         navigation.navigate(AUTH_STACK);
       }
