@@ -15,7 +15,7 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "postinstall": "patch-package",
     "build_android_example_win": "set export ENVFILE=.env.example && cd android && ./gradlew assembleRelease && cd ..",
-    "build_android_example": "export ENVFILE=.env.example && cd android && ./gradlew assembleRelease && cd ..",
+    "build_android_example": "export ENVFILE=.env.example && cd android && ./gradlew assembleRelease && cd .."
 
   },
   "dependencies": {
