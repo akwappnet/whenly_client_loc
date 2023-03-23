@@ -6,7 +6,10 @@ import React, {useState, useEffect} from 'react';
 import {Text} from 'native-base';
 import {useAppDispatch, authActions, selectAuthState} from '@whenly/redux';
 import moment from 'moment';
-import {ScrollView} from 'react-native';
+import {ActivityIndicator, Dimensions, ScrollView} from 'react-native';
+import colors from 'native-base/lib/typescript/theme/base/colors';
+import {isEmptyArray} from 'formik';
+const {height} = Dimensions.get('screen');
 
 const dummyActivities = [
   {
@@ -37,28 +40,70 @@ const dummyActivities = [
 
 const ProfileActivities = () => {
   const [activities, setActivities] = useState([]);
+  const [paginationres, setPaginationres] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [loadMoreLoading, setLoadMoreLoading] = useState(false);
+
   const appDispatch = useAppDispatch();
   useEffect(() => {
     getActivityApiCall();
   }, []);
 
   const getActivityApiCall = async () => {
-    const response = await appDispatch(authActions.getActivityListApi());
-    setActivities(response?.payload);
+    setLoadMoreLoading(true);
+    const response = await appDispatch(authActions.getActivityListApi(page));
+    if (!isEmptyArray(response.payload.data.docs)) {
+      setLoadMoreLoading(false);
+      setActivities(response.payload.data.docs);
+    } else {
+      setLoadMoreLoading(false);
+    }
+    setPaginationres(response.payload.data);
+  };
+
+  const loadMoreData = async () => {
+    // setPaginationres(...response.payload.data);
+    // let pageCount = page + 1;
+    // console.log('pageCount', pageCount);
+
+    if (paginationres.nextPage !== null) {
+      setLoadMoreLoading(true);
+      setPage(page + 1);
+      const response = await appDispatch(
+        authActions.getActivityListApi(page + 1),
+      );
+      if (!isEmptyArray(response.payload.data.docs)) {
+        setLoadMoreLoading(false);
+        setActivities([...activities, ...response.payload.data.docs]);
+        setPaginationres(response.payload.data);
+      } else {
+        setLoadMoreLoading(false);
+      }
+    } else {
+      setLoadMoreLoading(false);
+    }
   };
   function renderActivityItem({item}) {
     return (
       <Box key={item.id} flexDirection="column" py={4}>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <Text color="gray.900">{item.description}</Text>
-          <Text color="gray.500" fontSize={10}>{`${moment(
-            item.createdAt,
-          ).format('MMMM Do YYYY, h:mm:ss a')}`}</Text>
-        </ScrollView>
+        <Text color="gray.900">{item.description}</Text>
+        <Text color="gray.500" fontSize={10}>{`${moment(item.createdAt).format(
+          'MMMM Do YYYY, h:mm:ss a',
+        )}`}</Text>
       </Box>
     );
   }
 
+  const listFooterComponent = () => {
+    return (
+      <>
+        {loadMoreLoading ? (
+          <ActivityIndicator color={'red'} size="large" />
+        ) : null}
+      </>
+    );
+  };
   return (
     <ProfileContainer
       title="My Activities"
@@ -67,9 +112,14 @@ const ProfileActivities = () => {
         <FlatList
           data={activities}
           renderItem={renderActivityItem}
+          keyExtractor={(item, index) => index.toString()}
           ListEmptyComponent={
             <EmptyListMessage message="Nothing to see here!" />
           }
+          height={height * 0.55}
+          // onEndReachedThreshold={0.2}
+          onEndReached={loadMoreData}
+          ListFooterComponent={listFooterComponent}
           ItemSeparatorComponent={() => <Divider />}
         />
       </Card>

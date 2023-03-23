@@ -25,4 +25,5 @@ export const postSendOTP = (phoneNumber: string) => {
 export const postVerifyOTP = (code: string) =>
   axios.post(`/v1/auth/verify-otp?code=${code}`);
 
-export const getActivityList = () => axios.get(`/v1/activity`);
+export const getActivityList = (page: number) =>
+  axios.get(`/v1/activity?page=${page}`);

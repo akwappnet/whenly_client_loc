@@ -300,11 +300,12 @@ const logout = createAsyncThunk(joinWithSlash(AUTH, 'logout'), async () => {
 // for getting Activities
 const getActivityListApi = createAsyncThunk(
   joinWithSlash(AUTH, 'getActivityListApi'),
-  async () => {
+  async (page) => {
     try {
-      const response = await getActivityList();
+      console.log('page===action===>', page);
+      const response = await getActivityList(page);
       console.log('getActivities', JSON.stringify(response));
-      return response?.data?.data?.docs;
+      return response?.data;
     } catch (error) {
       console.log('Error', error);
     }
