@@ -69,10 +69,10 @@ const ProfileActivities = () => {
 
     if (paginationres.nextPage !== null) {
       setLoadMoreLoading(true);
-      setPage(page + 1);
       const response = await appDispatch(
         authActions.getActivityListApi(page + 1),
       );
+      setPage(page + 1);
       if (!isEmptyArray(response.payload.data.docs)) {
         setLoadMoreLoading(false);
         setActivities([...activities, ...response.payload.data.docs]);

@@ -26,4 +26,4 @@ export const postVerifyOTP = (code: string) =>
   axios.post(`/v1/auth/verify-otp?code=${code}`);
 
 export const getActivityList = (page: number) =>
-  axios.get(`/v1/activity?page=${page}`);
+  axios.get(`/v1/activity?page=${page}&sort=-createdAt`);
