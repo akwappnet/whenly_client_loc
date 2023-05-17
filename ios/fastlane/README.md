@@ -31,6 +31,14 @@ iOS Certificates
 
 Push a new development build to TestFlight - QA
 
+### ios release
+
+```sh
+[bundle exec] fastlane ios release
+```
+
+Push a new version to the App Store
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.

@@ -6,52 +6,51 @@ import {
   useAppDispatch,
 } from '@whenly/redux';
 import {CLASSES} from '@whenly/constants';
-import {differenceInMinutes, format} from 'date-fns';
-import {HStack, Box, Icon, Divider, Text, Button} from 'native-base';
+import {HStack, Box, Icon, Divider, Text, Button, Center} from 'native-base';
 import Feather from 'react-native-vector-icons/Feather';
 import {useSelector} from 'react-redux';
 import {convertToCurrency} from '@whenly/utils/numbers';
 import {useNavigation} from '@react-navigation/native';
 import {Pressable} from 'native-base';
+import moment from 'moment';
+import {SubscriptionTag} from '@whenly/utils/subscriptionTag';
 
 interface ClassItemProps {
   classData: ClassData;
+  showMerchant?: boolean;
 }
 
-export default function MerchantClassItem({classData}: ClassItemProps) {
+const MerchantClassItem = ({classData, showMerchant}: ClassItemProps) => {
   const appDispatch = useAppDispatch();
   const navigation = useNavigation();
   const {bookings} = useSelector(selectProductState);
   const [expanded, setExpanded] = useState(false);
 
-  let classDuration = differenceInMinutes(
-    new Date(classData.endsAt),
-    new Date(classData.startsAt),
-  );
-  let durationUnit = 'min';
-
-  if (classDuration >= 60) {
-    classDuration = Math.floor(classDuration / 60);
-    durationUnit = 'hr';
-  }
-
   const bookedClass = bookings.find(
-    (booking: any) => booking.id === classData._id,
+    (booking: any) => booking.classId === classData.id,
   );
-
   const descriptionLines = expanded ? {} : {numberOfLines: 1};
 
+  const start = moment.utc(classData.startsAt);
+  const end = moment.utc(classData.endsAt);
+
+  const duration = moment.duration(start.diff(end));
+
+  const subscription = SubscriptionTag(classData.tags.toLowerCase());
+  const viaSubscription = subscription?.sessions > 0;
   return (
-    <HStack alignItems="center" space={2}>
-      <Box flex={1}>
+    <HStack alignItems="center" space={2} py={2}>
+      <Box flex={3}>
         <Box my={1}>
           <Text fontWeight="bold">{classData.name}</Text>
+          {showMerchant && (
+            <Text>{`by ${classData?.merchant?.companyName}`}</Text>
+          )}
         </Box>
         <HStack my={1}>
           <Box backgroundColor="gray.200" px={2} py={1} borderRadius="2xl">
-            <Text fontSize={11} color="gray.600">{`${format(
-              new Date(classData.startsAt),
-              'hh:mma',
+            <Text fontSize={11} color="gray.600">{`${start.format(
+              'hh:mm a',
             )}`}</Text>
           </Box>
           <Box
@@ -64,7 +63,7 @@ export default function MerchantClassItem({classData}: ClassItemProps) {
             <Icon as={Feather} name="clock" color="gray.600" mr={2} />
             <Text
               fontSize={11}
-              color="gray.500">{`${classDuration} ${durationUnit}`}</Text>
+              color="gray.500">{`${duration.humanize()}`}</Text>
           </Box>
         </HStack>
         <Text color="gray.500">{classData.instructor}</Text>
@@ -80,35 +79,44 @@ export default function MerchantClassItem({classData}: ClassItemProps) {
         )}
       </Box>
       <Divider orientation="vertical" bg="gray.200" my={4} />
-      <Box px={4}>
-        <Text fontWeight="bold">{convertToCurrency(classData.price)}</Text>
+      <Center flex={1} px={2}>
+        <Text fontWeight="bold">
+          {viaSubscription ? 'Free' : convertToCurrency(classData.price)}
+        </Text>
         {!!bookedClass ? (
           <Button
             variant="solid"
-            borderRadius="3xl"
+            borderRadius="2xl"
             size="xs"
             height={8}
-            backgroundColor="gray.200"
+            minW={'80px'}
+            backgroundColor="gray.400"
             justifyContent="center"
             disabled>
-            {bookedClass.status === 'pending' ? 'Waitlist' : 'Booked'}
+            {bookedClass.status === 'pending' ? 'Booked' : 'Booked'}
           </Button>
         ) : (
           <Button
             variant="solid"
-            borderRadius="3xl"
+            borderRadius="2xl"
             size="xs"
             height={8}
+            minW={'80px'}
             backgroundColor="primary.400"
             justifyContent="center"
             onPress={() => {
               appDispatch(classActions.setClass(classData));
-              navigation.navigate('Checkout', {type: CLASSES});
+              navigation.replace('Checkout', {
+                type: CLASSES,
+                subscription,
+              });
             }}>
-            Book
+            {viaSubscription ? 'Book' : 'Drop-in'}
           </Button>
         )}
-      </Box>
+      </Center>
     </HStack>
   );
-}
+};
+
+export default MerchantClassItem;

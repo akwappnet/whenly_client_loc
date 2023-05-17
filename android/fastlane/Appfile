@@ -1,0 +1,2 @@
+json_key_file("/Users/stephenjuridico/Documents/Whenly\ Files/Config\ Important\!/pc-api-5231506423756924069-585-9231d0d08370.json") # Path to the json secret file - Follow https://docs.fastlane.tools/actions/supply/#setup to get one
+package_name("com.whenly") # e.g. com.krausefx.app

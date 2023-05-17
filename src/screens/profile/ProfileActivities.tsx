@@ -11,33 +11,6 @@ import colors from 'native-base/lib/typescript/theme/base/colors';
 import {isEmptyArray} from 'formik';
 const {height} = Dimensions.get('screen');
 
-const dummyActivities = [
-  {
-    id: 1,
-    description:
-      'Missed: Taekwondo at X on Oct 27, 2022 at 9:00 am with Coach N',
-    date: new Date(),
-  },
-  {
-    id: 2,
-    description:
-      'Missed: Taekwondo at X on Oct 27, 2022 at 9:00 am with Coach N',
-    date: new Date(),
-  },
-  {
-    id: 3,
-    description:
-      'Missed: Taekwondo at X on Oct 27, 2022 at 9:00 am with Coach N',
-    date: new Date(),
-  },
-  {
-    id: 4,
-    description:
-      'Missed: Taekwondo at X on Oct 27, 2022 at 9:00 am with Coach N',
-    date: new Date(),
-  },
-];
-
 const ProfileActivities = () => {
   const [activities, setActivities] = useState([]);
   const [paginationres, setPaginationres] = useState([]);
@@ -63,12 +36,10 @@ const ProfileActivities = () => {
   };
 
   const loadMoreData = async () => {
-    // setPaginationres(...response.payload.data);
-    // let pageCount = page + 1;
-    // console.log('pageCount', pageCount);
 
     if (paginationres.nextPage !== null) {
       setLoadMoreLoading(true);
+      
       const response = await appDispatch(
         authActions.getActivityListApi(page + 1),
       );

@@ -302,9 +302,7 @@ const getActivityListApi = createAsyncThunk(
   joinWithSlash(AUTH, 'getActivityListApi'),
   async (page) => {
     try {
-      console.log('page===action===>', page);
       const response = await getActivityList(page);
-      console.log('getActivities', JSON.stringify(response));
       return response?.data;
     } catch (error) {
       console.log('Error', error);

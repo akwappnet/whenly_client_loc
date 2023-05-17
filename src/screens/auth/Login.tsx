@@ -13,6 +13,7 @@ import {
   HStack,
   Divider,
   Alert,
+  Image,
 } from 'native-base';
 import {useSelector} from 'react-redux';
 import Feather from 'react-native-vector-icons/Feather';
@@ -22,6 +23,7 @@ import {Formik} from 'formik';
 import * as Yup from 'yup';
 import {metric} from '@whenly/theme/theme';
 import SocialLogin from '@whenly/components/SocialLogin';
+import {FORGOT_PASSWORD, REGISTER} from '@whenly/constants';
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email('Invalid format').required('Required Field'),
@@ -34,16 +36,26 @@ const Login = () => {
   const {error, loading} = useSelector(selectAuthState);
 
   return (
-    <Flex flex={1} safeArea p="4">
-      <IconButton
+    <Flex flex={1} bgColor={'white'} safeArea p="4">
+      {/* <IconButton
         onPress={() => navigation.goBack()}
         icon={<Icon as={Feather} size="xl" name="chevron-left" />}
         _icon={{color: 'black'}}
         borderRadius="full"
         color={'black'}
         alignSelf={'flex-start'}
+      /> */}
+      <Image
+        alt="whenly-logo"
+        alignSelf={'flex-start'}
+        source={require('../../assets/images/logotype_yellow.png')}
+        // size={'sm'}
+        h={'100px'}
+        // w={'200px'}
+        resizeMode="contain"
       />
-      <Heading mt={'8'}>Login</Heading>
+      <Heading mt={'50px'}>Welcome</Heading>
+      <Text>Login to your account</Text>
       {/* {error && <Alert status="error">{error}</Alert>} */}
       <Formik
         initialValues={{email: '', password: ''}}
@@ -108,6 +120,14 @@ const Login = () => {
               </FormControl.ErrorMessage>
             </FormControl>
             <Button
+              variant={'ghost'}
+              size={'md'}
+              onPress={() => {
+                navigation.navigate(FORGOT_PASSWORD);
+              }}>
+              Forgot Password
+            </Button>
+            <Button
               mt={'8'}
               isLoading={loading}
               isDisabled={!isValid}
@@ -115,7 +135,16 @@ const Login = () => {
               borderRadius={metric.buttonRadius}>
               LOGIN
             </Button>
-            <HStack
+            <Button
+              variant={'ghost'}
+              mt={'8'}
+              onPress={() => {
+                navigation.navigate(REGISTER);
+              }}
+              borderRadius={metric.buttonRadius}>
+              Don't have a account? Sign Up
+            </Button>
+            {/* <HStack
               mt={4}
               space={6}
               overflow="hidden"
@@ -127,7 +156,7 @@ const Login = () => {
               </Text>
               <Divider />
             </HStack>
-            <SocialLogin />
+            <SocialLogin /> */}
           </Stack>
         )}
       </Formik>

@@ -162,7 +162,7 @@ const EditProfile = (props: any) => {
   };
 
   return (
-    <Container backBtnVisible={!isFirstTime} title="Business Profile">
+    <Container backBtnVisible={!isFirstTime} title="Profile">
       <VStack space={4}>
         <StepIndicator
           currentPosition={currentStep}
@@ -200,12 +200,14 @@ const EditProfile = (props: any) => {
               }}
               onNext={() => {
                 if (currentStep === 2) {
-                  setAddress(addressRef.current.address());
+                  console.log(addressRef?.current.address());
+                  setAddress(addressRef?.current.address());
                 }
               }}
               onPrev={() => {
                 if (currentStep === 2) {
-                  setAddress(addressRef.current.address());
+                  console.log(addressRef?.current.address());
+                  setAddress(addressRef?.current.address());
                 }
               }}
             />
@@ -229,6 +231,7 @@ const EditProfile = (props: any) => {
             flex={1}
             onPress={() => {
               if (isLastStep) {
+                setAddress(addressRef?.current.address());
                 formik.handleSubmit();
               } else {
                 if (canProceed(currentStep + 1)) {

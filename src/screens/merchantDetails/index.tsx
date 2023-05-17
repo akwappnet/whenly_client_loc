@@ -11,7 +11,7 @@ import {
   Text,
   VStack,
 } from 'native-base';
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {
   planActions,
@@ -39,14 +39,17 @@ import {
 } from '@whenly/components/merchantDetails';
 import Carousel from 'react-native-snap-carousel';
 import {metric} from '@whenly/theme/theme';
+import {useFocusEffect} from '@react-navigation/native';
 
 const {height, width} = Dimensions.get('screen');
 
 const dummyPhoto =
   'https://images.unsplash.com/photo-1596357395217-80de13130e92?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1771&q=80';
 
-const MerchantDetailsScreen = (props: DetailsScreenNavigationProp) => {
-  const {navigation} = props;
+const MerchantDetailsScreen = (props) => {
+  const {navigation, route} = props;
+  console.log('Route', route);
+  const {from, type} = route?.params || {};
   const insets = useSafeAreaInsets();
   const appDispatch = useAppDispatch();
   const {user} = useSelector(selectAuthState);
@@ -62,9 +65,17 @@ const MerchantDetailsScreen = (props: DetailsScreenNavigationProp) => {
   useEffect(() => {
     if (merchant?.id) {
       appDispatch(planActions.plans(merchant.id));
-      appDispatch(classActions.classes(merchant.id));
+      // appDispatch(classActions.classes(merchant.id));
     }
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (from === 'success' && type === 'plan') {
+        setActiveTab(2);
+      }
+    }, [from, type]),
+  );
 
   console.log('Merchant', merchant);
 
@@ -75,7 +86,7 @@ const MerchantDetailsScreen = (props: DetailsScreenNavigationProp) => {
       case 1:
         return <MerchantPackages plans={docs} />;
       case 2:
-        return <MerchantClasses classes={classes} />;
+        return <MerchantClasses merchant={merchant} classes={classes} />;
       default:
         return <AboutMerchant merchant={merchant} />;
     }

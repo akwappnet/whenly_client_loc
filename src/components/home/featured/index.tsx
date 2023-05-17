@@ -1,52 +1,44 @@
-import React from 'react';
-import {Box, Heading, AspectRatio, Text, Image, Pressable} from 'native-base';
+import React, {useMemo} from 'react';
+import {Image} from 'native-base';
+import {metric} from '@whenly/theme/theme';
 
-const defaultBackground = `https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80`;
+import Carousel from 'react-native-snap-carousel';
 
 const Featured = () => {
+  const sliderWidth = metric.fullWidth;
+  const itemWidth = metric.fullWidth;
+
+  const items = useMemo(() => {
+    return [
+      require('../../../assets/images/banner/1.png'),
+      require('../../../assets/images/banner/2.png'),
+      require('../../../assets/images/banner/3.png'),
+    ];
+  }, []);
+
+  const _renderItem = ({item, index}) => {
+    return (
+      <Image
+        source={item}
+        alt="featured banner photo"
+        height={(metric.fullWidth * 9) / 16}
+        width={metric.fullWidth}
+        style={{borderRadius: 8}}
+        resizeMode="cover"
+      />
+    );
+  };
+
   return (
-    <>
-      <Box px="20px" py="8px">
-        <Heading>Search</Heading>
-      </Box>
-      <Pressable>
-        {({isPressed}) => (
-          <AspectRatio ratio={2.35 / 1} opacity={isPressed ? 0.6 : 1}>
-            <>
-              <Image
-                source={{uri: defaultBackground}}
-                resizeMode="cover"
-                height={'100%'}
-                width={'100%'}
-                alt="Featured Product"
-              />
-              <Box
-                p="20px"
-                justifyContent="flex-end"
-                bg={{
-                  linearGradient: {
-                    colors: ['rgba(0,0,0,0)', 'rgba(0,0,0,0.6)'],
-                    start: [50, 0],
-                    end: [50, 1],
-                  },
-                }}
-                position="absolute"
-                bottom={0}
-                left={0}
-                right={0}
-                top={0}>
-                <Text fontSize="2xl" color="white">
-                  Ad
-                </Text>
-                <Text fontSize="md" color="#FF5656" fontWeight="300">
-                  Sample Ad
-                </Text>
-              </Box>
-            </>
-          </AspectRatio>
-        )}
-      </Pressable>
-    </>
+    <Carousel
+      data={items}
+      renderItem={_renderItem}
+      sliderWidth={sliderWidth}
+      loop
+      autoplay
+      autoplayInterval={5000} // 5 sec per image
+      itemWidth={itemWidth - 80}
+    />
   );
 };
 

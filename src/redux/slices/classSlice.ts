@@ -1,6 +1,12 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import {CLASSES, PLAN, PRODUCT} from '@whenly/constants';
-import {getPlans, getPlan, getClasses, bookClass} from '@whenly/services';
+import {
+  getPlans,
+  getPlan,
+  getClasses,
+  bookClass,
+  cancelClass,
+} from '@whenly/services';
 import {joinWithSlash} from '@whenly/utils/string';
 
 export interface ClassData {
@@ -54,14 +60,26 @@ const initialState: ClassState = {
 
 const classes = createAsyncThunk(
   joinWithSlash(CLASSES, 'classes'),
-  async (merchantId: string, {rejectWithValue}) => {
+  async (payload: any, {rejectWithValue}) => {
     try {
-      const response = await getClasses({createdBy: merchantId});
+      const response = await getClasses(payload);
 
       console.log('fetching classes', response);
       return response?.data;
     } catch (error) {
       console.log('Error fetching classes', error);
+      return rejectWithValue(error?.message);
+    }
+  },
+);
+
+const cancelBooking = createAsyncThunk(
+  joinWithSlash(CLASSES, 'cancelBooking'),
+  async (bookingId: string, {rejectWithValue, getState}) => {
+    try {
+      const response = await cancelClass(bookingId);
+      return response?.data;
+    } catch (error) {
       return rejectWithValue(error?.message);
     }
   },
@@ -83,12 +101,31 @@ const classDetails = createAsyncThunk(
 
 const book = createAsyncThunk(
   joinWithSlash(CLASSES, 'book'),
-  async (referenceNo: string, {rejectWithValue, getState}) => {
+  async (
+    {
+      referenceNo,
+      txnId,
+      status,
+      subscription,
+    }: {
+      referenceNo: string;
+      txnId: string;
+      status: string;
+      subscription?: string;
+    },
+    {rejectWithValue, getState},
+  ) => {
     try {
       const {class: classState} = getState();
 
       console.log('book class details', classState);
-      const response = await bookClass(classState.class._id, referenceNo);
+      const response = await bookClass({
+        classId: classState.class._id,
+        referenceNo,
+        transactionId: txnId,
+        status,
+        subscription,
+      });
       return response?.data;
     } catch (error) {
       return rejectWithValue(error?.message || error);
@@ -130,6 +167,18 @@ const {actions, reducer} = createSlice({
       state.loadingClass = false;
       state.error = payload.error;
     },
+    [cancelBooking.pending.type]: (state) => {
+      state.loadingClass = true;
+      state.error = '';
+    },
+    [cancelBooking.fulfilled.type]: (state, {payload}) => {
+      state.loadingClass = false;
+      state.error = '';
+    },
+    [cancelBooking.rejected.type]: (state, {payload}) => {
+      state.loadingClass = false;
+      state.error = payload.error;
+    },
   },
 });
 
@@ -138,6 +187,7 @@ export const classActions = {
   classes,
   classDetails,
   book,
+  cancelBooking,
 };
 
 export default reducer;

@@ -79,6 +79,8 @@ export interface Subscription {
   createdBy: string;
   createdAt: string;
   updatedAt: string;
+  sessions: number;
+  tags: string;
   id: string;
 }
 
@@ -102,17 +104,15 @@ const initialState: ProductState = {
   bookings: [],
 };
 
-const getDragonpayToken = createAsyncThunk(
+const getDragonPayToken = createAsyncThunk(
   joinWithSlash(PRODUCT, 'dragonpay-token'),
   async (payload: RequestPaymentPayload, {rejectWithValue}) => {
     try {
       const response = await requestPayment(payload);
-
       console.log('get dragonpay token', response);
       return response.data;
     } catch (error) {
-      console.log('get dragonpay token error', error);
-
+      console.log('get dragonpay token error', error?.response);
       return rejectWithValue(error?.message || error);
     }
   },
@@ -162,15 +162,15 @@ const {actions, reducer} = createSlice({
   initialState,
   reducers: {},
   extraReducers: {
-    [getDragonpayToken.pending.type]: (state, {payload}) => {
+    [getDragonPayToken.pending.type]: (state, {payload}) => {
       state.loading = true;
       state.error = '';
     },
-    [getDragonpayToken.rejected.type]: (state, {payload}) => {
+    [getDragonPayToken.rejected.type]: (state, {payload}) => {
       state.loading = false;
       state.error = payload;
     },
-    [getDragonpayToken.fulfilled.type]: (state, {payload}) => {
+    [getDragonPayToken.fulfilled.type]: (state, {payload}) => {
       state.loading = false;
       state.error = '';
     },
@@ -206,7 +206,7 @@ const {actions, reducer} = createSlice({
 
 export const productActions = {
   ...actions,
-  getDragonpayToken,
+  getDragonPayToken,
   invoice,
   subscriptions,
   bookings,

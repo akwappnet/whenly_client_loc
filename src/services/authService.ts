@@ -8,6 +8,9 @@ export const getRequestAccountDeletion = () =>
 export const postLogin = (email: string, password: string) =>
   axios.post('/v1/auth/login', {email, password});
 
+export const postForgotPassword = (email: string) =>
+  axios.post('/v1/auth/forgot-password', {email});
+
 export const postRegister = (user: Partial<User>) =>
   axios.post('/v1/auth/register', {...user, providers: ['email']});
 
