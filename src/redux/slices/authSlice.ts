@@ -303,6 +303,7 @@ const getActivityListApi = createAsyncThunk(
   async (page) => {
     try {
       const response = await getActivityList(page);
+      console.log('@@@response', JSON.stringify(response));
       return response?.data;
     } catch (error) {
       console.log('Error', error);

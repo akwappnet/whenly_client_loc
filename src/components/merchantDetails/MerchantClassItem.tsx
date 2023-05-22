@@ -35,9 +35,10 @@ const MerchantClassItem = ({classData, showMerchant}: ClassItemProps) => {
   const end = moment.utc(classData.endsAt);
 
   const duration = moment.duration(start.diff(end));
-
+  console.log('@@@classData', JSON.stringify(classData), classData.price);
   const subscription = SubscriptionTag(classData.tags.toLowerCase());
   const viaSubscription = subscription?.sessions > 0;
+  console.log('@@@@viaSub', viaSubscription);
   return (
     <HStack alignItems="center" space={2} py={2}>
       <Box flex={3}>
@@ -69,6 +70,9 @@ const MerchantClassItem = ({classData, showMerchant}: ClassItemProps) => {
         <Text color="gray.500">{classData.instructor}</Text>
         <Text color="gray.500" {...descriptionLines}>
           {classData.description}
+        </Text>
+        <Text fontSize={11} color="gray.400">
+          {`In-Person`}
         </Text>
         {classData.description.length > 40 && (
           <Pressable onPress={() => setExpanded(!expanded)} mt={1}>

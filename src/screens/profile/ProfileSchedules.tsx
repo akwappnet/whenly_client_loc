@@ -9,9 +9,10 @@ import {
   Stagger,
   Text,
   VStack,
+  View,
 } from 'native-base';
 import React, {useEffect, useState} from 'react';
-import {Alert, SafeAreaView} from 'react-native';
+import {Alert, Modal, SafeAreaView, ScrollView} from 'react-native';
 import EmptyListMessage from '@whenly/components/EmptyListMessage';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {convertToCurrency} from '@whenly/utils/numbers';
@@ -24,10 +25,23 @@ import {
   selectBookings,
   classActions,
 } from '@whenly/redux';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
 import {useSelector} from 'react-redux';
 import moment from 'moment';
 
 import {errorToast, successToast} from '@whenly/utils/useToast';
+import {Image} from 'native-base';
+import {Pressable} from 'native-base';
+import {AirbnbRating, Rating} from 'react-native-ratings';
+import {KeyboardAvoidingView} from 'react-native';
+import {Platform} from 'react-native';
+import {isMatch} from 'date-fns';
+import {ProfileStyle} from './ProfileStyle';
+import {Input} from 'native-base';
+import {TouchableWithoutFeedback} from 'react-native';
 
 const dummySchedules = [
   {
@@ -54,6 +68,10 @@ const ProfileSchedules = (props: any) => {
   const schedules = useSelector(selectBookings);
 
   const [expandedSched, setExpandedSched] = useState<string | null>(null);
+  const [rating, setRating] = useState(0);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [reviewPageCount, setReviewPageCount] = useState(1);
+  const [commentReview, setCommentReview] = useState('');
 
   const toggleExpandedSched = (id: string) => {
     setExpandedSched(expandedSched === id ? null : id);
@@ -96,45 +114,56 @@ const ProfileSchedules = (props: any) => {
     );
   };
 
+  const ratingCompleted = (rating) => {
+    console.log('Rating is: ' + rating);
+  };
+
+  const handleSubmit = () => {
+    setNextPage();
+    console.log('yes');
+  };
+
+  const setNextPage = () => {
+    setReviewPageCount(reviewPageCount + 1);
+  };
+
+  const onPressSubmitReview = () => {
+    setReviewPageCount(1);
+    setModalVisible(!modalVisible);
+  };
+
+  const openModal = () => {
+    setModalVisible(!modalVisible);
+  };
   const renderScheduleItem = ({item}: any) => {
+    console.log('@@@@@itemSchedule', JSON.stringify(item));
     const isOpen = expandedSched === item.id;
-    const {name, createdAt, startsAt} = item.productDetails;
-    console.log(item)
+    // const {name, createdAt, startsAt} = item;
+
+    console.log(item);
     return (
-      <Box py={6}>
-        <Box flexDirection={'row'}>
-          <VStack flex={2}>
-            <Text
-              px={2}
-              // flex={2}
-              fontWeight={'bold'}
-              numberOfLines={2}
-              fontSize={12}>
-              {`${moment.utc(item.classDetails.startsAt).format('LLL')}`}
+      <View>
+        <View flexDirection={'row'} style={{marginVertical: hp('2%')}}>
+          <View flex={2}>
+            <Text px={2} fontWeight={'bold'} numberOfLines={2} fontSize={12}>
+              {`${moment.utc(item?.classDetails?.startsAt).format('LLL')}`}
             </Text>
-            <Text
-              px={2}
-              // flex={2}
-              fontWeight={'bold'}
-              numberOfLines={2}
-              fontSize={12}>
-              {name}
+            <Text px={2} fontWeight={'bold'} numberOfLines={2} fontSize={12}>
+              {item && item.name ? item.name : ''}
             </Text>
-            <Text
-              px={2}
-              // flex={2}
-              fontWeight={'bold'}
-              numberOfLines={2}
-              fontSize={12}>
-              {item.merchant.companyName}
+            <Text px={2} fontWeight={'bold'} numberOfLines={2} fontSize={12}>
+              {item.merchant &&
+              item.merchant.companyName &&
+              item.merchant.companyName
+                ? item.merchant.companyName
+                : ''}
             </Text>
-            
             <Text px={2} flex={2} numberOfLines={2} fontSize={12}>
-              {`Order Date: ${moment.utc(createdAt).format('LL')}`}
+              {`Order Date: ${moment.utc(item.createdAt).format('LL')}`}
             </Text>
-          </VStack>
+          </View>
           {item.status === 'pending' && (
-            <Box flex={1}>
+            <View flex={1}>
               <Button
                 onPress={() => onCancel(item.id)}
                 size="xs"
@@ -145,49 +174,215 @@ const ProfileSchedules = (props: any) => {
                 borderRadius={100}>
                 Cancel
               </Button>
-            </Box>
+            </View>
           )}
-          <Box flexDirection="row">
+          <View flexDirection="row">
             <Button
               variant="ghost"
               height={8}
               size="xs"
-              rightIcon={<Icon as={Entypo} name="chevron-small-down" />}
+              rightIcon={<Entypo name="chevron-small-down" />}
               fontSize={10}
               color="gray.500"
               onPress={() => toggleExpandedSched(item.id)}>
               Details
             </Button>
-          </Box>
-        </Box>
+          </View>
+        </View>
         {isOpen && (
-          <Box width={'70%'} py={4}>
+          <View width={'70%'} py={4}>
             <Divider />
-            <Box my={4}>
+            <View my={4}>
               <Text color="gray.500" fontWeight={'bold'}>
-                {item.duration}
+                {item.duration ? item.duration : ''}
               </Text>
               <Text color="gray.500">
                 {`Start: ${moment.utc(item.startsAt).format('LL')}`}
               </Text>
               <Text color="gray.500">
-                {`End: ${moment.utc(item.endsAt).format('LL')}`}
+                {`End: ${moment.utc(item?.endsAt).format('LL')}`}
               </Text>
-            </Box>
+              <View flexDirection="row">
+                <Image
+                  alignSelf={'center'}
+                  source={require('../../assets/images/categories/meet.png')}
+                  size={'xs'}
+                  mt="2"
+                  height={5}
+                  width={5}
+                />
+                <Pressable onPress={openModal}>
+                  <Text color="gray.500" mt="2" ml="2" fontWeight={'bold'}>
+                    {'Join meet now'}
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+            <Modal
+              visible={modalVisible}
+              animationType="slide"
+              onRequestClose={() => setModalVisible(false)}
+              transparent={true}>
+              <ScrollView
+                scrollEnabled={true}
+                showsVerticalScrollIndicator={false}
+                style={ProfileStyle.scrollContentContainer}>
+                <KeyboardAvoidingView
+                  behavior={Platform.OS === 'ios' ? 'padding' : ''}
+                  style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    flexDirection: 'column',
+                  }}>
+                  <View style={ProfileStyle.modelBottomSheetContainer}>
+                    <View style={ProfileStyle.modelBottomSheetBgContainer}>
+                      <>
+                        <Text
+                          color="gray.500"
+                          fontWeight={'bold'}
+                          textAlign={'center'}
+                          mt={6}
+                          fontSize={18}>
+                          Was the session effective?
+                        </Text>
+                        <View style={ProfileStyle.firstQuestionStyle}>
+                          <Button
+                            style={ProfileStyle.buttonStyle}
+                            onPress={handleSubmit}
+                            borderRadius={20}>
+                            Yes
+                          </Button>
+                          <Button
+                            style={ProfileStyle.buttonStyle}
+                            onPress={handleSubmit}
+                            borderRadius={20}>
+                            No
+                          </Button>
+                        </View>
+                      </>
+
+                      <View mb={1}>
+                        <Text
+                          color="gray.500"
+                          fontWeight={'bold'}
+                          textAlign={'center'}
+                          mt={2}
+                          fontSize={18}>
+                          Rate the trainer's expertise
+                        </Text>
+                        <AirbnbRating
+                          count={5}
+                          reviews={[
+                            'Poor',
+                            'Poor',
+                            'Good',
+                            'Good',
+                            'Excellent',
+                          ]}
+                          defaultRating={0}
+                          size={30}
+                          onFinishRating={ratingCompleted}
+                        />
+                      </View>
+                      <View mb={1}>
+                        <Text
+                          color="gray.500"
+                          fontWeight={'bold'}
+                          textAlign={'center'}
+                          mt={2}
+                          fontSize={18}>
+                          Rate your booking experience
+                        </Text>
+                        <AirbnbRating
+                          count={5}
+                          reviews={[
+                            'Difficult',
+                            'Difficult',
+                            'Okay',
+                            'Okay',
+                            'Easy',
+                          ]}
+                          defaultRating={0}
+                          size={30}
+                          onFinishRating={ratingCompleted}
+                        />
+                      </View>
+                      <>
+                        <Text
+                          color="gray.500"
+                          fontWeight={'bold'}
+                          textAlign={'center'}
+                          style={{marginHorizontal: wp('5%')}}
+                          mt={2}
+                          fontSize={18}>
+                          Did the session start and end on time?
+                        </Text>
+                        <View style={ProfileStyle.firstQuestionStyle}>
+                          <Button
+                            style={ProfileStyle.buttonStyle}
+                            onPress={handleSubmit}
+                            borderRadius={20}>
+                            Yes
+                          </Button>
+                          <Button
+                            style={ProfileStyle.buttonStyle}
+                            onPress={handleSubmit}
+                            borderRadius={20}>
+                            No
+                          </Button>
+                        </View>
+                      </>
+                      <Text
+                        color="gray.500"
+                        fontWeight={'bold'}
+                        textAlign={'center'}
+                        style={{marginHorizontal: wp('5%')}}
+                        mt={2}
+                        fontSize={18}>
+                        Any comments or suggestions for us?
+                      </Text>
+                      <View style={{marginHorizontal: wp('6%')}}>
+                        <Input
+                          style={{marginHorizontal: wp('2%')}}
+                          variant="underlined"
+                          placeholder="Enter Comments"
+                          autoCorrect={false}
+                          fontSize={14}
+                          onChangeText={(commentReview) =>
+                            setCommentReview(commentReview)
+                          }
+                          value={commentReview}
+                        />
+                      </View>
+                      <Button
+                        style={{
+                          marginHorizontal: wp('2%'),
+                          marginVertical: hp('4%'),
+                        }}
+                        onPress={onPressSubmitReview}
+                        borderRadius={20}>
+                        Submit Review
+                      </Button>
+                    </View>
+                  </View>
+                </KeyboardAvoidingView>
+              </ScrollView>
+            </Modal>
             <Divider />
-            <Box my={4} flexDirection="row" justifyContent={'space-between'}>
+            <View my={2} flexDirection="row" justifyContent={'space-between'}>
               <Text color="gray.300" fontStyle={'italic'}>
                 Total Amount
               </Text>
               <Text color="gray.500" fontWeight={'bold'}>
                 {convertToCurrency(
-                  item.viaSubscription ? 0 : item?.pricingDetails?.price || 0,
+                  item?.viaSubscription ? 0 : item?.pricingDetails?.price || 0,
                 )}
               </Text>
-            </Box>
-          </Box>
+            </View>
+          </View>
         )}
-      </Box>
+      </View>
     );
   };
 

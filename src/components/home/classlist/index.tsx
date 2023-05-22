@@ -22,6 +22,7 @@ import {useSelector} from 'react-redux';
 import React, {useCallback, useEffect} from 'react';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {metric} from '@whenly/theme/theme';
+import {Modal} from 'react-native';
 
 const defaultThumbnail =
   'https://images.unsplash.com/photo-1596357395217-80de13130e92?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1771&q=80';
@@ -32,7 +33,7 @@ const ClassList = () => {
 
   const currentUser = useSelector(selectCurrentUser);
   const {loading, docs} = useSelector(selectMerchantState);
-
+  console.log('@@@@curentUSer', currentUser);
   useFocusEffect(
     useCallback(() => {
       console.log('Fetch Nearby');

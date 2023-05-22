@@ -123,8 +123,8 @@ const book = createAsyncThunk(
         classId: classState.class._id,
         referenceNo,
         transactionId: txnId,
-        status,
-        subscription,
+        // status,
+        // subscription,
       });
       return response?.data;
     } catch (error) {

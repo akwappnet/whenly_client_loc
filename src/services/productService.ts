@@ -20,20 +20,22 @@ export interface RequestPaymentPayload {
 }
 
 export const getPlans = (params: any) =>
-  axios.get(
-    `/v1/plans?${qs.stringify({...params, visible: 'yes', status: 'active'})}`,
-  );
+  // axios.get(
+  //   `/v1/plans?${qs.stringify({...params, visible: 'yes', status: 'active'})}`,
+  // );
+  axios.get(`/v1/plans`);
 
 export const getPlan = (planId: string) => axios.get(`/v1/plans/${planId}`);
 
 export const getClasses = (params: any) =>
-  axios.get(
-    `/v1/classes?${qs.stringify({
-      ...params,
-      visible: 'yes',
-      status: 'active',
-    })}`,
-  );
+  // axios.get(
+  //   `/v1/classes?${qs.stringify({
+  //     ...params,
+  //     visible: 'yes',
+  //     status: 'active',
+  //   })}`,
+  // );
+  axios.get(`/v1/classes`);
 
 export const getClass = (classId: string) =>
   axios.get(`/v1/classes/${classId}`);
@@ -51,8 +53,15 @@ export const subscribePlan = (payload: {
   planId: string;
   referenceNo: string;
   transactionId: string;
-  status: string;
-}) => axios.post('v1/clients/subscribe', {...payload, via: 'mobile'});
+}) => axios.post('v1/clients/subscribe', {...payload});
+
+//TODO:this parameter pass then not success payment
+// export const subscribePlan = (payload: {
+//   planId: string;
+//   referenceNo: string;
+//   transactionId: string;
+//   status: string;
+// }) => axios.post('v1/clients/subscribe', {...payload, via: 'mobile'});
 
 export const cancelSubscription = (subscriptionId: string) =>
   axios.delete(`v1/clients/subscriptions/${subscriptionId}`);
@@ -61,9 +70,17 @@ export const bookClass = (payload: {
   classId: string;
   referenceNo: string;
   transactionId: string;
-  status: string;
-  subscription: string;
-}) => axios.post('v1/clients/book', {...payload, via: 'mobile'});
+  // status: string;
+  // subscription: string;
+}) => axios.post('v1/clients/book', {...payload});
+
+// export const bookClass = (payload: {
+//   classId: string;
+//   referenceNo: string;
+//   transactionId: string;
+//   status: string;
+//   subscription: string;
+// }) => axios.post('v1/clients/book', {...payload, via: 'mobile'});
 
 export const cancelClass = (classId: string) =>
   axios.delete(`v1/booking/${classId}`);

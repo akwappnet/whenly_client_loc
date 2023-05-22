@@ -25,7 +25,8 @@ export const selectSubscriptionTags = createSelector(
   (subs) =>
     subs.map((sub) => ({
       id: sub.id,
-      tags: sub.tags.toLowerCase().split(','),
+      tags: sub.tags,
+      // tags: sub.tags.toLowerCase().split(','),
       sessions: sub.sessions,
       status: sub.status,
       count: 0,

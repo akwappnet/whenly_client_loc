@@ -10,7 +10,7 @@ import {Settings} from 'react-native-fbsdk-next';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {GOOGLE_CONFIG} from '@whenly/constants';
 import {AlertNotificationRoot} from 'react-native-alert-notification';
-import {APP_URL, ENVIRONMENT, ONESIGNAL_APP_ID} from '@env';
+import {API_URL, APP_URL, ENVIRONMENT, ONESIGNAL_APP_ID} from '@env';
 import OneSignal from 'react-native-onesignal';
 
 const App = () => {
@@ -22,7 +22,6 @@ const App = () => {
 
   // OneSignal Initialization
   OneSignal.setAppId(ONESIGNAL_APP_ID);
-
   // promptForPushNotificationsWithUserResponse will show the native iOS or Android notification permission prompt.
   // We recommend removing the following code and instead using an In-App Message to prompt for notification permission (See step 8)
   OneSignal.promptForPushNotificationsWithUserResponse();
@@ -54,7 +53,7 @@ const App = () => {
     },
   };
 
-  console.log('ENVIRONMENT ===', ENVIRONMENT, APP_URL);
+  console.log('ENVIRONMENT ===', ENVIRONMENT, API_URL, APP_URL);
 
   return (
     <NativeBaseProvider theme={theme} config={config}>

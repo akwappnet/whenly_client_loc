@@ -33,7 +33,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
  *   bundleInRelease: true,
  *
  *   // whether to bundle JS and assets in another build variant (if configured).
- *   // See http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Build-Variants
+ *   // See http://tools.android.com/tech-docs/neimplementation platform('com.google.firebase:firebase-bom:32.0.0')w-build-system/user-guide#TOC-Build-Variants
  *   // The configuration property can be in the following formats
  *   //         'bundleIn${productFlavor}${buildType}'
  *   //         'bundleIn${buildType}'
@@ -295,6 +295,8 @@ dependencies {
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 
+implementation platform('com.google.firebase:firebase-bom:32.0.0')
+implementation 'com.google.firebase:firebase-analytics'
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.fbjni'
     }

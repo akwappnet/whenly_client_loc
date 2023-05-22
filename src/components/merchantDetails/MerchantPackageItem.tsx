@@ -62,6 +62,9 @@ export default function MerchantPackageItem({
         <Text color="gray.500" {...descriptionLines}>
           {planData.description}
         </Text>
+        <Text fontSize={11} color="gray.400">
+          {`In-Person`}
+        </Text>
         {planData.description.length > 40 && (
           <Pressable onPress={() => setExpanded(!expanded)} mt={1}>
             <Text color="primary.600">{`Read ${
