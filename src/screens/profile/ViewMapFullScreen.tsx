@@ -6,15 +6,17 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
+import HeaderBar from '@whenly/components/HeaderBar';
 import MapView, {Marker} from 'react-native-maps';
 const ViewMapFullScreen = (props) => {
-  const {route} = props;
+  const {navigation, route} = props;
   const [latitude, setLatitude] = useState(route?.params?.User?.address[0].lat);
   const [longitude, setLongitude] = useState(
     route?.params?.User?.address[0].long,
   );
   return (
     <View style={styles.container}>
+      <HeaderBar white onBack={() => navigation.goBack()} title="" />
       <MapView
         style={styles.map}
         initialRegion={{
@@ -68,7 +70,7 @@ const ViewMapFullScreen = (props) => {
 
 export default ViewMapFullScreen;
 export const styles = StyleSheet.create({
-  container: {flex: 1},
+  container: {height: hp('100%')},
   map: {
     flex: 1,
   },
