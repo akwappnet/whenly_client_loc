@@ -66,6 +66,7 @@ const MerchantDetailsScreen = (props) => {
     if (merchant?.id) {
       appDispatch(planActions.plans(merchant.id));
       // appDispatch(classActions.classes(merchant.id));
+      console.log('@@@@@merchanteLat', merchant);
     }
   }, []);
 
@@ -82,7 +83,7 @@ const MerchantDetailsScreen = (props) => {
   const content = useMemo(() => {
     switch (activeTab) {
       case 0:
-        return <AboutMerchant merchant={merchant} />;
+        return <AboutMerchant merchant={merchant} user={user} />;
       case 1:
         return <MerchantPackages plans={docs} />;
       case 2:

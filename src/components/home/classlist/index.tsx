@@ -97,7 +97,10 @@ const ClassList = () => {
                           merchantActions.merchant(merchant._id),
                         ).then((response) => {
                           if (response.type === 'merchant/merchant/fulfilled') {
-                            navigation.push('Details');
+                            navigation.push('Details', {
+                              currentUserDetail:
+                                currentUser && currentUser ? currentUser : null,
+                            });
                           }
                         });
                       }}

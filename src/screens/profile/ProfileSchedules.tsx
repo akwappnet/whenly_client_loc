@@ -72,6 +72,10 @@ const ProfileSchedules = (props: any) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [reviewPageCount, setReviewPageCount] = useState(1);
   const [commentReview, setCommentReview] = useState('');
+  const [isSelectedYes, setIsSelectedYes] = useState('');
+  const [isSelectedNo, setIsSelectedNo] = useState('');
+  const [isSelectedYesSecond, setIsSelectedYesSecond] = useState('');
+  const [isSelectedNoSecond, setIsSelectedNoSecond] = useState('');
 
   const toggleExpandedSched = (id: string) => {
     setExpandedSched(expandedSched === id ? null : id);
@@ -118,9 +122,21 @@ const ProfileSchedules = (props: any) => {
     console.log('Rating is: ' + rating);
   };
 
-  const handleSubmit = () => {
-    setNextPage();
-    console.log('yes');
+  const handleSubmit = (values) => {
+    if (values === 'yesEffective') {
+      setIsSelectedYes(values);
+      setIsSelectedNo('');
+    } else if (values === 'NoEffective') {
+      setIsSelectedNo(values);
+      setIsSelectedYes('');
+    } else if (values === 'endTimeYes') {
+      setIsSelectedYesSecond(values);
+      setIsSelectedNoSecond('');
+    } else if (values === 'endTimeNo') {
+      setIsSelectedNoSecond(values);
+      setIsSelectedYesSecond('');
+    }
+    console.log('@@@values', values);
   };
 
   const setNextPage = () => {
@@ -128,12 +144,17 @@ const ProfileSchedules = (props: any) => {
   };
 
   const onPressSubmitReview = () => {
-    setReviewPageCount(1);
     setModalVisible(!modalVisible);
   };
 
   const openModal = () => {
     setModalVisible(!modalVisible);
+    if (modalVisible === false) {
+      setIsSelectedNo('');
+      setIsSelectedYes('');
+      setIsSelectedNoSecond('');
+      setIsSelectedYesSecond('');
+    }
   };
   const renderScheduleItem = ({item}: any) => {
     console.log('@@@@@itemSchedule', JSON.stringify(item));
@@ -248,16 +269,40 @@ const ProfileSchedules = (props: any) => {
                         </Text>
                         <View style={ProfileStyle.firstQuestionStyle}>
                           <Button
-                            style={ProfileStyle.buttonStyle}
-                            onPress={handleSubmit}
+                            style={
+                              isSelectedYes === ''
+                                ? [
+                                    ProfileStyle.buttonStyle,
+                                    {backgroundColor: 'grey'},
+                                  ]
+                                : ProfileStyle.buttonStyle
+                            }
+                            onPress={() => handleSubmit('yesEffective')}
                             borderRadius={20}>
-                            Yes
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                              }}>
+                              <Text style={{color: 'white'}}>yes</Text>
+                            </View>
                           </Button>
                           <Button
-                            style={ProfileStyle.buttonStyle}
-                            onPress={handleSubmit}
+                            style={
+                              isSelectedNo === ''
+                                ? [
+                                    ProfileStyle.buttonStyle,
+                                    {backgroundColor: 'grey'},
+                                  ]
+                                : ProfileStyle.buttonStyle
+                            }
+                            onPress={() => handleSubmit('NoEffective')}
                             borderRadius={20}>
-                            No
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                              }}>
+                              <Text style={{color: 'white'}}>No</Text>
+                            </View>
                           </Button>
                         </View>
                       </>
@@ -280,7 +325,7 @@ const ProfileSchedules = (props: any) => {
                             'Good',
                             'Excellent',
                           ]}
-                          defaultRating={0}
+                          defaultRating={1}
                           size={30}
                           onFinishRating={ratingCompleted}
                         />
@@ -303,7 +348,7 @@ const ProfileSchedules = (props: any) => {
                             'Okay',
                             'Easy',
                           ]}
-                          defaultRating={0}
+                          defaultRating={1}
                           size={30}
                           onFinishRating={ratingCompleted}
                         />
@@ -320,16 +365,34 @@ const ProfileSchedules = (props: any) => {
                         </Text>
                         <View style={ProfileStyle.firstQuestionStyle}>
                           <Button
-                            style={ProfileStyle.buttonStyle}
-                            onPress={handleSubmit}
+                            style={
+                              isSelectedYesSecond === ''
+                                ? [
+                                    ProfileStyle.buttonStyle,
+                                    {backgroundColor: 'grey'},
+                                  ]
+                                : ProfileStyle.buttonStyle
+                            }
+                            onPress={() => handleSubmit('endTimeYes')}
                             borderRadius={20}>
-                            Yes
+                            <View style={{flexDirection: 'row'}}>
+                              <Text style={{color: 'white'}}>yes</Text>
+                            </View>
                           </Button>
                           <Button
-                            style={ProfileStyle.buttonStyle}
-                            onPress={handleSubmit}
+                            style={
+                              isSelectedNoSecond === ''
+                                ? [
+                                    ProfileStyle.buttonStyle,
+                                    {backgroundColor: 'grey'},
+                                  ]
+                                : ProfileStyle.buttonStyle
+                            }
+                            onPress={() => handleSubmit('endTimeNo')}
                             borderRadius={20}>
-                            No
+                            <View style={{flexDirection: 'row'}}>
+                              <Text style={{color: 'white'}}>No</Text>
+                            </View>
                           </Button>
                         </View>
                       </>

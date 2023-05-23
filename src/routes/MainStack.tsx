@@ -7,6 +7,7 @@ import {
   ProfileActivities,
   EditProfile,
   Settings,
+  ViewMapFullScreen,
 } from '@whenly/screens/profile';
 import DetailsScreen from '@whenly/screens/merchantDetails';
 import CheckoutScreen from '@whenly/screens/checkout';
@@ -23,6 +24,7 @@ const MainStack = () => (
     <Stack.Screen name="UserLocation" component={UserLocation} />
     <Stack.Screen name="SearchResults" component={SearchResults} />
     <Stack.Screen name="EditProfile" component={EditProfile} />
+    <Stack.Screen name="ViewMapFullScreen" component={ViewMapFullScreen} />
     <Stack.Screen name="Settings" component={Settings} />
     <Stack.Screen name="Schedule" component={ProfileSchedules} />
     <Stack.Screen name="Passes" component={ProfilePasses} />
