@@ -1,4 +1,3 @@
-import ProfileContainer from '@whenly/components/profile/ProfileContainer';
 import Card from '@whenly/components/Card';
 import EmptyListMessage from '@whenly/components/EmptyListMessage';
 import {Box, Divider, FlatList} from 'native-base';
@@ -36,10 +35,9 @@ const ProfileActivities = () => {
   };
 
   const loadMoreData = async () => {
-
     if (paginationres.nextPage !== null) {
       setLoadMoreLoading(true);
-      
+
       const response = await appDispatch(
         authActions.getActivityListApi(page + 1),
       );
@@ -76,25 +74,19 @@ const ProfileActivities = () => {
     );
   };
   return (
-    <ProfileContainer
-      title="My Activities"
-      subtitle="You can find all the records of your activities here.">
-      <Card>
-        <FlatList
-          data={activities}
-          renderItem={renderActivityItem}
-          keyExtractor={(item, index) => index.toString()}
-          ListEmptyComponent={
-            <EmptyListMessage message="Nothing to see here!" />
-          }
-          height={height * 0.55}
-          // onEndReachedThreshold={0.2}
-          onEndReached={loadMoreData}
-          ListFooterComponent={listFooterComponent}
-          ItemSeparatorComponent={() => <Divider />}
-        />
-      </Card>
-    </ProfileContainer>
+    <Card>
+      <FlatList
+        data={activities}
+        renderItem={renderActivityItem}
+        keyExtractor={(item, index) => index.toString()}
+        ListEmptyComponent={<EmptyListMessage message="Nothing to see here!" />}
+        height={height * 0.55}
+        // onEndReachedThreshold={0.2}
+        onEndReached={loadMoreData}
+        ListFooterComponent={listFooterComponent}
+        ItemSeparatorComponent={() => <Divider />}
+      />
+    </Card>
   );
 };
 export default ProfileActivities;
