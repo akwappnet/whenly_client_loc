@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Divider,
-  FlatList,
   Icon,
   Stagger,
   Text,
@@ -12,7 +11,7 @@ import {
   View,
 } from 'native-base';
 import React, {useEffect, useState} from 'react';
-import {Alert, Modal, SafeAreaView, ScrollView} from 'react-native';
+import {Alert, Modal, SafeAreaView, ScrollView, FlatList} from 'react-native';
 import EmptyListMessage from '@whenly/components/EmptyListMessage';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {convertToCurrency} from '@whenly/utils/numbers';
@@ -160,17 +159,17 @@ const ProfileSchedules = (props: any) => {
     console.log('@@@@@itemSchedule', JSON.stringify(item));
     const isOpen = expandedSched === item.id;
     // const {name, createdAt, startsAt} = item;
-
     console.log(item);
     return (
       <View>
         <View flexDirection={'row'} style={{marginVertical: hp('2%')}}>
+          {/* <View flexDirection={'row'} style={{marginBottom: hp('8%')}}> */}
           <View flex={2}>
             <Text px={2} fontWeight={'bold'} numberOfLines={2} fontSize={12}>
               {`${moment.utc(item?.classDetails?.startsAt).format('LLL')}`}
             </Text>
             <Text px={2} fontWeight={'bold'} numberOfLines={2} fontSize={12}>
-              {item && item.name ? item.name : ''}
+              {item && item.productDetails.name ? item.productDetails.name : ''}
             </Text>
             <Text px={2} fontWeight={'bold'} numberOfLines={2} fontSize={12}>
               {item.merchant &&
@@ -457,6 +456,7 @@ const ProfileSchedules = (props: any) => {
         <FlatList
           data={schedules}
           renderItem={renderScheduleItem}
+          keyExtractor={(item, index) => index.toString()}
           ListEmptyComponent={
             <EmptyListMessage message="You have not booked any classes or appointments yet." />
           }
