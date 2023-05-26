@@ -1,15 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import Card from '@whenly/components/Card';
-import {
-  Box,
-  Button,
-  Divider,
-  FlatList,
-  HStack,
-  Icon,
-  Text,
-  VStack,
-} from 'native-base';
+import {Box, Button, Divider, FlatList, Icon, Text, VStack} from 'native-base';
 import EmptyListMessage from '@whenly/components/EmptyListMessage';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {convertToCurrency} from '@whenly/utils/numbers';
@@ -92,7 +83,7 @@ const ProfilePasses = (props: any) => {
   function renderScheduleItem({item}: any) {
     const isOpen = expandedSched === item.id;
     const {name, description, createdAt, duration} = item.productDetails;
-    console.log('renderScheduleItem', item)
+    console.log('renderScheduleItem', item);
     return (
       <Box py={6}>
         <Box flexDirection={'row'}>
@@ -117,10 +108,12 @@ const ProfilePasses = (props: any) => {
               px={2}
               // flex={2}
               fontWeight={'bold'}
-              color={"red.500"}
+              color={'red.500'}
               numberOfLines={2}
               fontSize={12}>
-              {`Sessions: ${item.sessions === -1 ? 'Unlimited' : item.sessions}`}
+              {`Sessions: ${
+                item.sessions === -1 ? 'Unlimited' : item.sessions
+              }`}
             </Text>
             <Text px={2} flex={2} numberOfLines={2} fontSize={12}>
               {`Order Date: ${moment.utc(createdAt).format('LL')}`}

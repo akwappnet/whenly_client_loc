@@ -63,7 +63,7 @@ export default function MerchantPackageItem({
           {planData.description}
         </Text>
         <Text fontSize={11} color="gray.400">
-          {`In-Person`}
+          {`${planData && planData?.serviceType ? planData?.serviceType : ''}`}
         </Text>
         {planData.description.length > 40 && (
           <Pressable onPress={() => setExpanded(!expanded)} mt={1}>

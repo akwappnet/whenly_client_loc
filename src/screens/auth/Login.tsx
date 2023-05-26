@@ -59,8 +59,8 @@ const Login = () => {
       {/* {error && <Alert status="error">{error}</Alert>} */}
       <Formik
         initialValues={{
-          email: 'jaldip@mailinator.com',
-          password: 'Wappnet@123',
+          email: '',
+          password: '',
         }}
         validationSchema={LoginSchema}
         validateOnMount

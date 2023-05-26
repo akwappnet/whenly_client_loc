@@ -72,7 +72,9 @@ const MerchantClassItem = ({classData, showMerchant}: ClassItemProps) => {
           {classData.description}
         </Text>
         <Text fontSize={11} color="gray.400">
-          {`In-Person`}
+          {`${
+            classData && classData?.serviceType ? classData?.serviceType : ''
+          }`}
         </Text>
         {classData.description.length > 40 && (
           <Pressable onPress={() => setExpanded(!expanded)} mt={1}>

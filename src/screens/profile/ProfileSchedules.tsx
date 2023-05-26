@@ -222,21 +222,23 @@ const ProfileSchedules = (props: any) => {
               <Text color="gray.500">
                 {`End: ${moment.utc(item?.endsAt).format('LL')}`}
               </Text>
-              <View flexDirection="row">
-                <Image
-                  alignSelf={'center'}
-                  source={require('../../assets/images/categories/meet.png')}
-                  size={'xs'}
-                  mt="2"
-                  height={5}
-                  width={5}
-                />
-                <Pressable onPress={openModal}>
-                  <Text color="gray.500" mt="2" ml="2" fontWeight={'bold'}>
-                    {'Join meet now'}
-                  </Text>
-                </Pressable>
-              </View>
+              {item.serviceType === 'Online' ? (
+                <View flexDirection="row">
+                  <Image
+                    alignSelf={'center'}
+                    source={require('../../assets/images/categories/meet.png')}
+                    size={'xs'}
+                    mt="2"
+                    height={5}
+                    width={5}
+                  />
+                  <Pressable onPress={openModal}>
+                    <Text color="gray.500" mt="2" ml="2" fontWeight={'bold'}>
+                      {'Join meet now'}
+                    </Text>
+                  </Pressable>
+                </View>
+              ) : null}
             </View>
             <Modal
               visible={modalVisible}
