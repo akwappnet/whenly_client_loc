@@ -15,6 +15,11 @@ export const selectBookings = createSelector(
   (product) => product.bookings,
 );
 
+export const selectQuestion = createSelector(
+  selectProductState,
+  (product) => product.question,
+);
+
 export const selectSubscriptions = createSelector(
   selectProductState,
   (product) => product.subscriptions,

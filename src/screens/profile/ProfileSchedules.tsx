@@ -23,6 +23,7 @@ import {
   selectCurrentUser,
   selectBookings,
   classActions,
+  selectQuestion,
 } from '@whenly/redux';
 import {
   heightPercentageToDP as hp,
@@ -41,6 +42,7 @@ import {isMatch} from 'date-fns';
 import {ProfileStyle} from './ProfileStyle';
 import {Input} from 'native-base';
 import {TouchableWithoutFeedback} from 'react-native';
+import {Linking} from 'react-native';
 
 const dummySchedules = [
   {
@@ -65,9 +67,12 @@ const dummySchedules = [
 const ProfileSchedules = (props: any) => {
   const appDispatch = useAppDispatch();
   const schedules = useSelector(selectBookings);
+  const questions = useSelector(selectQuestion);
 
   const [expandedSched, setExpandedSched] = useState<string | null>(null);
   const [rating, setRating] = useState(0);
+  const [selectedValue, setSelectedValue] = useState('');
+  const [selectedEndTimeValue, setSelectedEndTimeValue] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [reviewPageCount, setReviewPageCount] = useState(1);
   const [commentReview, setCommentReview] = useState('');
@@ -82,9 +87,10 @@ const ProfileSchedules = (props: any) => {
 
   useEffect(() => {
     appDispatch(productActions.bookings());
+    appDispatch(productActions.reviewQuestions());
   }, [appDispatch]);
 
-  console.log('schedules', schedules);
+  console.log('schedules', schedules, '@@@@@@@question', questions);
 
   const onCancel = (classId: string) => {
     Alert.alert(
@@ -119,22 +125,35 @@ const ProfileSchedules = (props: any) => {
 
   const ratingCompleted = (rating) => {
     console.log('Rating is: ' + rating);
+    setRating(rating);
+    const reviews = ['Poor', 'Poor', 'Good', 'Good', 'Excellent'];
+    const selectedReview = reviews[rating - 1];
+    setSelectedValue(selectedReview);
+    console.log('Selected review:', selectedReview);
+  };
+
+  const ratingCompletedendTime = (rating) => {
+    const reviews = ['Difficult', 'Difficult', 'Okay', 'Okay', 'Easy'];
+    const selectedReview = reviews[rating - 1];
+    console.log('Selected review:second', selectedReview);
+    setSelectedEndTimeValue(selectedReview);
   };
 
   const handleSubmit = (values) => {
     if (values === 'yesEffective') {
-      setIsSelectedYes(values);
+      setIsSelectedYes('Yes');
       setIsSelectedNo('');
     } else if (values === 'NoEffective') {
-      setIsSelectedNo(values);
+      setIsSelectedNo('No');
       setIsSelectedYes('');
     } else if (values === 'endTimeYes') {
-      setIsSelectedYesSecond(values);
+      setIsSelectedYesSecond('Yes');
       setIsSelectedNoSecond('');
     } else if (values === 'endTimeNo') {
-      setIsSelectedNoSecond(values);
+      setIsSelectedNoSecond('No');
       setIsSelectedYesSecond('');
     }
+
     console.log('@@@values', values);
   };
 
@@ -142,8 +161,68 @@ const ProfileSchedules = (props: any) => {
     setReviewPageCount(reviewPageCount + 1);
   };
 
-  const onPressSubmitReview = () => {
-    setModalVisible(!modalVisible);
+  const onPressSubmitReview = async (item) => {
+    // console.log('@@@@Onpress', JSON.stringify(item));
+    try {
+      const payload = {
+        bookingId: item?._id,
+        classId: item?.classId,
+        rating: rating,
+        merchantId: item?.merchant?._id,
+        answerList: [
+          {
+            questionId: questions[0]?.id,
+            answer: isSelectedYes === 'Yes' ? isSelectedYes : 'No',
+          },
+          {
+            questionId: questions[1]?.id,
+            answer: selectedValue,
+          },
+          {
+            questionId: questions[2]?.id,
+            answer: selectedEndTimeValue,
+          },
+          {
+            questionId: questions[3]?.id,
+            answer: isSelectedYesSecond === 'Yes' ? isSelectedYesSecond : 'No',
+          },
+          {
+            questionId: questions[4]?.id,
+            answer: commentReview,
+          },
+        ],
+      };
+      const response = await appDispatch(
+        productActions.submitReviewQuestions(payload),
+      );
+      setModalVisible(!modalVisible);
+      console.log('@@@@@responseSubmitData', response);
+    } catch (error) {
+      console.log('Error', error);
+    }
+    console.log('@@@@payload', payload);
+  };
+
+  const openGoogleMeetLink = async (meetLink) => {
+    console.log('meeet', meetLink);
+    try {
+      // Check if the Linking API is supported on the device
+      // const supported = await Linking.canOpenURL(meetLink);
+
+      // if (supported) {
+      // Open the Google Meet link
+      await Linking.openURL(meetLink);
+      // } else {
+      //   console.log(
+      //     'Opening Google Meet links is not supported on this device.',
+      //   );
+      // }
+    } catch (error) {
+      console.log(
+        'An error occurred while opening the Google Meet link:',
+        error,
+      );
+    }
   };
 
   const openModal = () => {
@@ -156,10 +235,10 @@ const ProfileSchedules = (props: any) => {
     }
   };
   const renderScheduleItem = ({item}: any) => {
-    console.log('@@@@@itemSchedule', JSON.stringify(item));
+    // console.log('@@@@@itemSchedule', JSON.stringify(item));
     const isOpen = expandedSched === item.id;
     // const {name, createdAt, startsAt} = item;
-    console.log(item);
+    // console.log(item);
     return (
       <View>
         <View flexDirection={'row'} style={{marginVertical: hp('2%')}}>
@@ -210,7 +289,7 @@ const ProfileSchedules = (props: any) => {
           </View>
         </View>
         {isOpen && (
-          <View width={'70%'} py={4}>
+          <View width={'70%'} py={10}>
             <Divider />
             <View my={4}>
               <Text color="gray.500" fontWeight={'bold'}>
@@ -222,7 +301,7 @@ const ProfileSchedules = (props: any) => {
               <Text color="gray.500">
                 {`End: ${moment.utc(item?.endsAt).format('LL')}`}
               </Text>
-              {item.serviceType === 'Online' ? (
+              {item?.classDetails?.serviceType === 'Online' ? (
                 <View flexDirection="row">
                   <Image
                     alignSelf={'center'}
@@ -232,13 +311,17 @@ const ProfileSchedules = (props: any) => {
                     height={5}
                     width={5}
                   />
-                  <Pressable onPress={openModal}>
+                  <Pressable
+                    onPress={() =>
+                      openGoogleMeetLink(item?.classDetails?.googleMeetLink)
+                    }>
                     <Text color="gray.500" mt="2" ml="2" fontWeight={'bold'}>
                       {'Join meet now'}
                     </Text>
                   </Pressable>
                 </View>
               ) : null}
+              {/* onPress={openModal} */}
             </View>
             <Modal
               visible={modalVisible}
@@ -266,7 +349,7 @@ const ProfileSchedules = (props: any) => {
                           textAlign={'center'}
                           mt={6}
                           fontSize={18}>
-                          Was the session effective?
+                          {questions && questions[0]?.questionText}
                         </Text>
                         <View style={ProfileStyle.firstQuestionStyle}>
                           <Button
@@ -315,7 +398,7 @@ const ProfileSchedules = (props: any) => {
                           textAlign={'center'}
                           mt={2}
                           fontSize={18}>
-                          Rate the trainer's expertise
+                          {questions && questions[1]?.questionText}
                         </Text>
                         <AirbnbRating
                           count={5}
@@ -338,7 +421,7 @@ const ProfileSchedules = (props: any) => {
                           textAlign={'center'}
                           mt={2}
                           fontSize={18}>
-                          Rate your booking experience
+                          {questions && questions[2]?.questionText}
                         </Text>
                         <AirbnbRating
                           count={5}
@@ -351,7 +434,7 @@ const ProfileSchedules = (props: any) => {
                           ]}
                           defaultRating={1}
                           size={30}
-                          onFinishRating={ratingCompleted}
+                          onFinishRating={ratingCompletedendTime}
                         />
                       </View>
                       <>
@@ -362,7 +445,7 @@ const ProfileSchedules = (props: any) => {
                           style={{marginHorizontal: wp('5%')}}
                           mt={2}
                           fontSize={18}>
-                          Did the session start and end on time?
+                          {questions && questions[3]?.questionText}
                         </Text>
                         <View style={ProfileStyle.firstQuestionStyle}>
                           <Button
@@ -404,7 +487,7 @@ const ProfileSchedules = (props: any) => {
                         style={{marginHorizontal: wp('5%')}}
                         mt={2}
                         fontSize={18}>
-                        Any comments or suggestions for us?
+                        {questions && questions[4]?.questionText}
                       </Text>
                       <View style={{marginHorizontal: wp('6%')}}>
                         <Input
@@ -424,7 +507,7 @@ const ProfileSchedules = (props: any) => {
                           marginHorizontal: wp('2%'),
                           marginVertical: hp('4%'),
                         }}
-                        onPress={onPressSubmitReview}
+                        onPress={() => onPressSubmitReview(item)}
                         borderRadius={20}>
                         Submit Review
                       </Button>
@@ -458,6 +541,7 @@ const ProfileSchedules = (props: any) => {
         <FlatList
           data={schedules}
           renderItem={renderScheduleItem}
+          style={{height: hp('70%')}}
           keyExtractor={(item, index) => index.toString()}
           ListEmptyComponent={
             <EmptyListMessage message="You have not booked any classes or appointments yet." />

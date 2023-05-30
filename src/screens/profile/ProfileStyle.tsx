@@ -44,8 +44,6 @@ const ProfileStyle = StyleSheet.create({
     width: wp('100%'),
     height: hp('100%'),
     backgroundColor: 'rgba(0,0,0,0.1)',
-    backgroundColor: 'red',
-    // bottom: 0,
   },
 });
 

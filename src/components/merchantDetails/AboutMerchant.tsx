@@ -1,6 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {Box, Text} from 'native-base';
-import {Merchant} from '@whenly/redux';
+import {
+  Merchant,
+  productActions,
+  selectMerchantState,
+  useAppDispatch,
+} from '@whenly/redux';
 import Collapse from '@whenly/components/Collapse';
 import {capitalizeFirstLetter} from '@whenly/utils/string';
 import {StyleSheet} from 'react-native';
@@ -20,6 +25,7 @@ import {FlatList} from 'react-native';
 import {Divider} from 'native-base';
 import EmptyListMessage from '@whenly/components/EmptyListMessage';
 import {AirbnbRating} from 'react-native-ratings';
+import {useSelector} from 'react-redux';
 interface AboutMerchantProps {
   merchant: Merchant | null;
 }
@@ -27,22 +33,13 @@ interface AboutMerchantProps {
 interface ContactDetail {
   [key: string]: string | undefined;
 }
-const AboutMerchant = ({merchant, user}: AboutMerchantProps) => {
+const AboutMerchant = ({user}: AboutMerchantProps) => {
   const {height} = Dimensions.get('screen');
+  const {merchant} = useSelector(selectMerchantState);
   const [initialRegion, setInitialRegion] = useState(null);
-  const [reviewData, setReviewData] = useState([
-    {
-      name: 'Jack',
-      ratingCount: 2,
-      comment: '',
-    },
-    {
-      name: 'Jack',
-      ratingCount: 3,
-      comment:
-        'Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum has been the industrys standard dummy text ever since the 1500s when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
-    },
-  ]);
+  const appDispatch = useAppDispatch();
+  const [reviewData, setReviewData] = useState([]);
+  console.log('@@@@merchantData', merchant);
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
   const navigation = useNavigation();
@@ -58,8 +55,9 @@ const AboutMerchant = ({merchant, user}: AboutMerchantProps) => {
   };
 
   useEffect(() => {
-    setLatitude(user.address[0].lat);
-    setLongitude(user.address[0].long);
+    setLatitude(user?.address[0]?.lat);
+    setLongitude(user?.address[0]?.long);
+    getReviewAnswerApi(merchant?.id);
   }, []);
 
   const contactDetails: ContactDetail = {
@@ -68,7 +66,25 @@ const AboutMerchant = ({merchant, user}: AboutMerchantProps) => {
     ...(merchant?.companySocial || {}),
   };
 
+  const getReviewAnswerApi = async (merchantId) => {
+    console.log('@@@merchantDetail', merchantId);
+    try {
+      const response = await appDispatch(
+        productActions.getReviewData(merchantId),
+      );
+      if (response.payload.length > 0) {
+        setReviewData(response.payload);
+        console.log('if');
+      } else {
+        console.log('else');
+      }
+      console.log('@@@@@reviewData', JSON.stringify(response.payload.length));
+    } catch (error) {
+      console.log('@@@@@@@@@@@@error', error);
+    }
+  };
   const renderReviewData = ({item}) => {
+    console.log('@@@@@@ansDAta', JSON.stringify(item?.answerList.length));
     return (
       <View style={styles.Viewcontainer}>
         <View style={{paddingTop: 12}}>
@@ -78,14 +94,14 @@ const AboutMerchant = ({merchant, user}: AboutMerchantProps) => {
           />
         </View>
         <View style={styles.subContainer}>
-          <Text style={styles.textStye}>{`${item?.name}`}</Text>
+          <Text style={styles.textStye}>{`${item?.customer?.firstName}`}</Text>
           <View style={{flexDirection: 'row'}}>
             <Text style={styles.textStye}>{`Expertise Ratings :`}</Text>
             <AirbnbRating
               count={5}
               // reviewSize={2}
               reviews={['Poor', 'Poor', 'Good', 'Good', 'Excellent']}
-              defaultRating={item.ratingCount}
+              defaultRating={item.rating}
               isDisabled={true}
               showRating={false}
               size={12}
@@ -93,7 +109,9 @@ const AboutMerchant = ({merchant, user}: AboutMerchantProps) => {
           </View>
           <View style={{flexDirection: 'row'}}>
             {/* <Text style={styles.textStye}>{`Comments:`}</Text> */}
-            <Text style={styles.textStyeSub}>{`${item?.comment}`}</Text>
+            <Text style={styles.textStyeSub}>{`${
+              item?.answerList.length > 4 ? item?.answerList[4]?.answer : ''
+            }`}</Text>
           </View>
         </View>
       </View>
@@ -202,7 +220,7 @@ const AboutMerchant = ({merchant, user}: AboutMerchantProps) => {
                 ListEmptyComponent={
                   <EmptyListMessage message="Nothing to see here!" />
                 }
-                height={height * 0.55}
+                // height={height * 0.55}
                 // onEndReachedThreshold={0.2}
                 // onEndReached={loadMoreData}
                 // ListFooterComponent={listFooterComponent}

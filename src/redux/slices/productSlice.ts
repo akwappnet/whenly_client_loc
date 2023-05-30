@@ -4,9 +4,12 @@ import {
   getBookings,
   getInvoice,
   getPlans,
+  getReviewDataDetail,
+  getReviewQuestion,
   getSubscriptions,
   requestPayment,
   RequestPaymentPayload,
+  reviewSubmit,
 } from '@whenly/services';
 import {joinWithSlash} from '@whenly/utils/string';
 
@@ -92,6 +95,7 @@ export type ProductState = {
   invoices: Invoice[];
   subscriptions: Subscription[];
   bookings: Subscription[];
+  question: Subscription[];
 };
 
 const initialState: ProductState = {
@@ -102,6 +106,7 @@ const initialState: ProductState = {
   invoices: [],
   subscriptions: [],
   bookings: [],
+  question: [],
 };
 
 const getDragonPayToken = createAsyncThunk(
@@ -157,6 +162,46 @@ const bookings = createAsyncThunk(
   },
 );
 
+const reviewQuestions = createAsyncThunk(
+  joinWithSlash(CLIENT, 'reviewQuestion'),
+  async (_, {rejectWithValue}) => {
+    try {
+      const response = await getReviewQuestion();
+      console.log('reviewQuestion', response);
+      return response?.data;
+    } catch (error) {
+      return rejectWithValue(error.message || error);
+    }
+  },
+);
+
+const getReviewData = createAsyncThunk(
+  joinWithSlash(CLIENT, 'getReviewData'),
+  async (params) => {
+    console.log('@@@@paramsClientClass', params);
+    try {
+      const response = await getReviewDataDetail(params);
+      console.log('@@@responseReviewData', JSON.stringify(response));
+      return response?.data;
+    } catch (error) {
+      console.log('Error', error);
+    }
+  },
+);
+
+const submitReviewQuestions = createAsyncThunk(
+  joinWithSlash(CLIENT, 'submitReviewQuestion'),
+  async (payload, {rejectWithValue}) => {
+    try {
+      const response = await reviewSubmit(payload);
+      console.log('reviewQuestionData', response);
+    } catch (error: any) {
+      console.log('Error', error);
+      return rejectWithValue('Something went wrong. Please try again');
+    }
+  },
+);
+
 const {actions, reducer} = createSlice({
   name: PRODUCT,
   initialState,
@@ -201,6 +246,32 @@ const {actions, reducer} = createSlice({
       state.error = '';
       state.bookings = payload.docs;
     },
+    [reviewQuestions.pending.type]: (state, {payload}) => {
+      state.loading = true;
+      state.error = '';
+    },
+    [reviewQuestions.fulfilled.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = '';
+      state.question = payload.data.docs;
+    },
+    [submitReviewQuestions.pending.type]: (state, {payload}) => {
+      state.loading = true;
+      state.error = '';
+    },
+    [submitReviewQuestions.fulfilled.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = '';
+      // state.question = payload.data.docs;
+    },
+    [getReviewData.pending.type]: (state, {payload}) => {
+      state.loading = true;
+      state.error = '';
+    },
+    [getReviewData.fulfilled.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = '';
+    },
   },
 });
 
@@ -210,6 +281,9 @@ export const productActions = {
   invoice,
   subscriptions,
   bookings,
+  reviewQuestions,
+  submitReviewQuestions,
+  getReviewData,
 };
 
 export default reducer;
