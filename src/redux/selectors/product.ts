@@ -20,6 +20,11 @@ export const selectQuestion = createSelector(
   (product) => product.question,
 );
 
+export const selectLatestReviewBooking = createSelector(
+  selectProductState,
+  (product) => product.latestBookingReview,
+);
+
 export const selectSubscriptions = createSelector(
   selectProductState,
   (product) => product.subscriptions,

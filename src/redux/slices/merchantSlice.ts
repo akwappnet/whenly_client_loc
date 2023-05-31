@@ -90,7 +90,7 @@ const merchant = createAsyncThunk(
     try {
       const response = await getMerchant(merchantId);
 
-      console.log('FETCHING Merchant', response);
+      console.log('FETCHING Merchant', JSON.stringify(response));
       return response?.data;
     } catch (error) {
       console.log('Error fetching merchants', error);

@@ -3,6 +3,7 @@ import {CLIENT, PRODUCT} from '@whenly/constants';
 import {
   getBookings,
   getInvoice,
+  getLatestBookingReview,
   getPlans,
   getReviewDataDetail,
   getReviewQuestion,
@@ -96,6 +97,7 @@ export type ProductState = {
   subscriptions: Subscription[];
   bookings: Subscription[];
   question: Subscription[];
+  latestBookingReview: Subscription[];
 };
 
 const initialState: ProductState = {
@@ -107,6 +109,7 @@ const initialState: ProductState = {
   subscriptions: [],
   bookings: [],
   question: [],
+  latestBookingReview: [],
 };
 
 const getDragonPayToken = createAsyncThunk(
@@ -185,6 +188,19 @@ const getReviewData = createAsyncThunk(
       return response?.data;
     } catch (error) {
       console.log('Error', error);
+    }
+  },
+);
+
+const latestBookingReview = createAsyncThunk(
+  joinWithSlash(CLIENT, 'latestBookingReview'),
+  async (_, {rejectWithValue}) => {
+    try {
+      const response = await getLatestBookingReview();
+      console.log('lastestBooking', JSON.stringify(response));
+      return response?.data;
+    } catch (error) {
+      return rejectWithValue(error.message || error);
     }
   },
 );
@@ -272,6 +288,15 @@ const {actions, reducer} = createSlice({
       state.loading = false;
       state.error = '';
     },
+    [latestBookingReview.pending.type]: (state, {payload}) => {
+      state.loading = true;
+      state.error = '';
+    },
+    [latestBookingReview.fulfilled.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = '';
+      state.latestBookingReview = payload;
+    },
   },
 });
 
@@ -284,6 +309,7 @@ export const productActions = {
   reviewQuestions,
   submitReviewQuestions,
   getReviewData,
+  latestBookingReview,
 };
 
 export default reducer;

@@ -24,6 +24,7 @@ import {
   selectBookings,
   classActions,
   selectQuestion,
+  selectLatestReviewBooking,
 } from '@whenly/redux';
 import {
   heightPercentageToDP as hp,
@@ -68,6 +69,7 @@ const ProfileSchedules = (props: any) => {
   const appDispatch = useAppDispatch();
   const schedules = useSelector(selectBookings);
   const questions = useSelector(selectQuestion);
+  const latestReviewBooking = useSelector(selectLatestReviewBooking);
 
   const [expandedSched, setExpandedSched] = useState<string | null>(null);
   const [rating, setRating] = useState(0);
@@ -88,9 +90,11 @@ const ProfileSchedules = (props: any) => {
   useEffect(() => {
     appDispatch(productActions.bookings());
     appDispatch(productActions.reviewQuestions());
+    appDispatch(productActions.latestBookingReview());
   }, [appDispatch]);
 
-  console.log('schedules', schedules, '@@@@@@@question', questions);
+  // console.log('schedules', schedules, '@@@@@@@question', questions);
+  console.log('@@@@@latestBookingReview', JSON.stringify(latestReviewBooking));
 
   const onCancel = (classId: string) => {
     Alert.alert(

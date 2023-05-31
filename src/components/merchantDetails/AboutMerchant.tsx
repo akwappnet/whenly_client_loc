@@ -39,6 +39,8 @@ const AboutMerchant = ({user}: AboutMerchantProps) => {
   const [initialRegion, setInitialRegion] = useState(null);
   const appDispatch = useAppDispatch();
   const [reviewData, setReviewData] = useState([]);
+  const [visibleReviews, setVisibleReviews] = useState([]);
+  const [showAll, setShowAll] = useState(false);
   console.log('@@@@merchantData', merchant);
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
@@ -60,31 +62,39 @@ const AboutMerchant = ({user}: AboutMerchantProps) => {
     getReviewAnswerApi(merchant?.id);
   }, []);
 
+  useEffect(() => {
+    const initialVisibleReviews = reviewData.slice(0, 3);
+    setVisibleReviews(initialVisibleReviews);
+  }, [reviewData]);
+
   const contactDetails: ContactDetail = {
     phone: merchant?.companyNumber,
     email: merchant?.email,
     ...(merchant?.companySocial || {}),
   };
 
+  const handleSeeAll = () => {
+    setVisibleReviews(reviewData); // Set visibleReviews to contain all reviews
+    setShowAll(true); // Set showAll to true
+  };
+
   const getReviewAnswerApi = async (merchantId) => {
-    console.log('@@@merchantDetail', merchantId);
     try {
       const response = await appDispatch(
         productActions.getReviewData(merchantId),
       );
       if (response.payload.length > 0) {
         setReviewData(response.payload);
-        console.log('if');
       } else {
         console.log('else');
       }
-      console.log('@@@@@reviewData', JSON.stringify(response.payload.length));
+      // console.log('@@@@@reviewData', JSON.stringify(response.payload.length));
     } catch (error) {
       console.log('@@@@@@@@@@@@error', error);
     }
   };
   const renderReviewData = ({item}) => {
-    console.log('@@@@@@ansDAta', JSON.stringify(item?.answerList.length));
+    // console.log('@@@@@@ansDAta', JSON.stringify(item?.answerList.length));
     return (
       <View style={styles.Viewcontainer}>
         <View style={{paddingTop: 12}}>
@@ -96,7 +106,7 @@ const AboutMerchant = ({user}: AboutMerchantProps) => {
         <View style={styles.subContainer}>
           <Text style={styles.textStye}>{`${item?.customer?.firstName}`}</Text>
           <View style={{flexDirection: 'row'}}>
-            <Text style={styles.textStye}>{`Expertise Ratings :`}</Text>
+            <Text style={styles.textStye}>{`Ratings :`}</Text>
             <AirbnbRating
               count={5}
               // reviewSize={2}
@@ -208,11 +218,16 @@ const AboutMerchant = ({user}: AboutMerchantProps) => {
           }
           content={
             <View>
-              <TouchableOpacity style={styles.checkInButton}>
-                <Text style={styles.buttonTextStyle}>{'See All'}</Text>
-              </TouchableOpacity>
+              {!showAll && (
+                <TouchableOpacity
+                  style={styles.checkInButton}
+                  onPress={() => handleSeeAll()}>
+                  <Text style={styles.buttonTextStyle}>{'See All'}</Text>
+                </TouchableOpacity>
+              )}
+
               <FlatList
-                data={reviewData}
+                data={visibleReviews}
                 style={styles.mainContainerStyle}
                 renderItem={renderReviewData}
                 showsVerticalScrollIndicator={false}
