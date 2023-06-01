@@ -25,6 +25,7 @@ import {
   classActions,
   selectQuestion,
   selectLatestReviewBooking,
+  submitReviewget,
 } from '@whenly/redux';
 import {
   heightPercentageToDP as hp,
@@ -44,6 +45,7 @@ import {ProfileStyle} from './ProfileStyle';
 import {Input} from 'native-base';
 import {TouchableWithoutFeedback} from 'react-native';
 import {Linking} from 'react-native';
+import {isEmptyArray} from 'formik';
 
 const dummySchedules = [
   {
@@ -69,8 +71,10 @@ const ProfileSchedules = (props: any) => {
   const appDispatch = useAppDispatch();
   const schedules = useSelector(selectBookings);
   const questions = useSelector(selectQuestion);
-  const latestReviewBooking = useSelector(selectLatestReviewBooking);
+  const reviewData = useSelector(submitReviewget);
 
+  const latestReviewBooking = useSelector(selectLatestReviewBooking);
+  const [scheduleData, setScheduleData] = useState(schedules);
   const [expandedSched, setExpandedSched] = useState<string | null>(null);
   const [rating, setRating] = useState(0);
   const [selectedValue, setSelectedValue] = useState('');
@@ -90,11 +94,34 @@ const ProfileSchedules = (props: any) => {
   useEffect(() => {
     appDispatch(productActions.bookings());
     appDispatch(productActions.reviewQuestions());
-    appDispatch(productActions.latestBookingReview());
   }, [appDispatch]);
 
-  // console.log('schedules', schedules, '@@@@@@@question', questions);
-  console.log('@@@@@latestBookingReview', JSON.stringify(latestReviewBooking));
+  useEffect(() => {
+    // const getLatestData = () => {
+    //   appDispatch(productActions.latestBookingReview());
+    // };
+    const interval = setInterval(() => {
+      appDispatch(productActions.latestBookingReview());
+      console.log('@@@@@latestBookingReview', latestReviewBooking);
+      if (
+        !isEmptyArray(latestReviewBooking) &&
+        latestReviewBooking.length > 0
+      ) {
+        console.log('@@@@@@@@@@@@');
+        openModal();
+      } else {
+        console.log('!!!!!!!!!');
+      }
+    }, 30 * 60 * 1000); // 30 minutes in milliseconds
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+  // // console.log('schedules', schedules, '@@@@@@@question', questions);
+  useEffect(() => {
+    const timer = setTimeout(() => console.log('Initial timeout!'), 1000);
+  }, []);
 
   const onCancel = (classId: string) => {
     Alert.alert(
@@ -157,8 +184,6 @@ const ProfileSchedules = (props: any) => {
       setIsSelectedNoSecond('No');
       setIsSelectedYesSecond('');
     }
-
-    console.log('@@@values', values);
   };
 
   const setNextPage = () => {
@@ -166,7 +191,6 @@ const ProfileSchedules = (props: any) => {
   };
 
   const onPressSubmitReview = async (item) => {
-    // console.log('@@@@Onpress', JSON.stringify(item));
     try {
       const payload = {
         bookingId: item?._id,
@@ -200,11 +224,10 @@ const ProfileSchedules = (props: any) => {
         productActions.submitReviewQuestions(payload),
       );
       setModalVisible(!modalVisible);
-      console.log('@@@@@responseSubmitData', response);
+      // console.log('@@@@@responseSubmitData', JSON.stringify(response));
     } catch (error) {
       console.log('Error', error);
     }
-    console.log('@@@@payload', payload);
   };
 
   const openGoogleMeetLink = async (meetLink) => {
@@ -230,6 +253,7 @@ const ProfileSchedules = (props: any) => {
   };
 
   const openModal = () => {
+    console.log('@@@@@@isModalOpen');
     setModalVisible(!modalVisible);
     if (modalVisible === false) {
       setIsSelectedNo('');
@@ -239,7 +263,6 @@ const ProfileSchedules = (props: any) => {
     }
   };
   const renderScheduleItem = ({item}: any) => {
-    // console.log('@@@@@itemSchedule', JSON.stringify(item));
     const isOpen = expandedSched === item.id;
     // const {name, createdAt, startsAt} = item;
     // console.log(item);
@@ -264,6 +287,28 @@ const ProfileSchedules = (props: any) => {
             <Text px={2} flex={2} numberOfLines={2} fontSize={12}>
               {`Order Date: ${moment.utc(item.createdAt).format('LL')}`}
             </Text>
+            <View flexDirection="row">
+              <Image
+                alignSelf={'center'}
+                source={require('../../assets/images/categories/ic_review.png')}
+                size={'xs'}
+                mt="2"
+                ml="2"
+                height={6}
+                width={6}
+              />
+              {item?.isReviewed === 'false' ? (
+                <Pressable onPress={openModal}>
+                  <Text color="gray.500" mt="2" ml="2" fontWeight={'bold'}>
+                    {'Add Review'}
+                  </Text>
+                </Pressable>
+              ) : (
+                <Text color="gray.500" mt="2" ml="2" fontWeight={'bold'}>
+                  {'Review Added'}
+                </Text>
+              )}
+            </View>
           </View>
           {item.status === 'pending' && (
             <View flex={1}>
@@ -327,199 +372,7 @@ const ProfileSchedules = (props: any) => {
               ) : null}
               {/* onPress={openModal} */}
             </View>
-            <Modal
-              visible={modalVisible}
-              animationType="slide"
-              onRequestClose={() => setModalVisible(false)}
-              transparent={true}>
-              <ScrollView
-                scrollEnabled={true}
-                showsVerticalScrollIndicator={false}
-                style={ProfileStyle.scrollContentContainer}>
-                <KeyboardAvoidingView
-                  behavior={Platform.OS === 'ios' ? 'padding' : ''}
-                  style={{
-                    flex: 1,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    flexDirection: 'column',
-                  }}>
-                  <View style={ProfileStyle.modelBottomSheetContainer}>
-                    <View style={ProfileStyle.modelBottomSheetBgContainer}>
-                      <>
-                        <Text
-                          color="gray.500"
-                          fontWeight={'bold'}
-                          textAlign={'center'}
-                          mt={6}
-                          fontSize={18}>
-                          {questions && questions[0]?.questionText}
-                        </Text>
-                        <View style={ProfileStyle.firstQuestionStyle}>
-                          <Button
-                            style={
-                              isSelectedYes === ''
-                                ? [
-                                    ProfileStyle.buttonStyle,
-                                    {backgroundColor: 'grey'},
-                                  ]
-                                : ProfileStyle.buttonStyle
-                            }
-                            onPress={() => handleSubmit('yesEffective')}
-                            borderRadius={20}>
-                            <View
-                              style={{
-                                flexDirection: 'row',
-                              }}>
-                              <Text style={{color: 'white'}}>yes</Text>
-                            </View>
-                          </Button>
-                          <Button
-                            style={
-                              isSelectedNo === ''
-                                ? [
-                                    ProfileStyle.buttonStyle,
-                                    {backgroundColor: 'grey'},
-                                  ]
-                                : ProfileStyle.buttonStyle
-                            }
-                            onPress={() => handleSubmit('NoEffective')}
-                            borderRadius={20}>
-                            <View
-                              style={{
-                                flexDirection: 'row',
-                              }}>
-                              <Text style={{color: 'white'}}>No</Text>
-                            </View>
-                          </Button>
-                        </View>
-                      </>
 
-                      <View mb={1}>
-                        <Text
-                          color="gray.500"
-                          fontWeight={'bold'}
-                          textAlign={'center'}
-                          mt={2}
-                          fontSize={18}>
-                          {questions && questions[1]?.questionText}
-                        </Text>
-                        <AirbnbRating
-                          count={5}
-                          reviews={[
-                            'Poor',
-                            'Poor',
-                            'Good',
-                            'Good',
-                            'Excellent',
-                          ]}
-                          defaultRating={1}
-                          size={30}
-                          onFinishRating={ratingCompleted}
-                        />
-                      </View>
-                      <View mb={1}>
-                        <Text
-                          color="gray.500"
-                          fontWeight={'bold'}
-                          textAlign={'center'}
-                          mt={2}
-                          fontSize={18}>
-                          {questions && questions[2]?.questionText}
-                        </Text>
-                        <AirbnbRating
-                          count={5}
-                          reviews={[
-                            'Difficult',
-                            'Difficult',
-                            'Okay',
-                            'Okay',
-                            'Easy',
-                          ]}
-                          defaultRating={1}
-                          size={30}
-                          onFinishRating={ratingCompletedendTime}
-                        />
-                      </View>
-                      <>
-                        <Text
-                          color="gray.500"
-                          fontWeight={'bold'}
-                          textAlign={'center'}
-                          style={{marginHorizontal: wp('5%')}}
-                          mt={2}
-                          fontSize={18}>
-                          {questions && questions[3]?.questionText}
-                        </Text>
-                        <View style={ProfileStyle.firstQuestionStyle}>
-                          <Button
-                            style={
-                              isSelectedYesSecond === ''
-                                ? [
-                                    ProfileStyle.buttonStyle,
-                                    {backgroundColor: 'grey'},
-                                  ]
-                                : ProfileStyle.buttonStyle
-                            }
-                            onPress={() => handleSubmit('endTimeYes')}
-                            borderRadius={20}>
-                            <View style={{flexDirection: 'row'}}>
-                              <Text style={{color: 'white'}}>yes</Text>
-                            </View>
-                          </Button>
-                          <Button
-                            style={
-                              isSelectedNoSecond === ''
-                                ? [
-                                    ProfileStyle.buttonStyle,
-                                    {backgroundColor: 'grey'},
-                                  ]
-                                : ProfileStyle.buttonStyle
-                            }
-                            onPress={() => handleSubmit('endTimeNo')}
-                            borderRadius={20}>
-                            <View style={{flexDirection: 'row'}}>
-                              <Text style={{color: 'white'}}>No</Text>
-                            </View>
-                          </Button>
-                        </View>
-                      </>
-                      <Text
-                        color="gray.500"
-                        fontWeight={'bold'}
-                        textAlign={'center'}
-                        style={{marginHorizontal: wp('5%')}}
-                        mt={2}
-                        fontSize={18}>
-                        {questions && questions[4]?.questionText}
-                      </Text>
-                      <View style={{marginHorizontal: wp('6%')}}>
-                        <Input
-                          style={{marginHorizontal: wp('2%')}}
-                          variant="underlined"
-                          placeholder="Enter Comments"
-                          autoCorrect={false}
-                          fontSize={14}
-                          onChangeText={(commentReview) =>
-                            setCommentReview(commentReview)
-                          }
-                          value={commentReview}
-                        />
-                      </View>
-                      <Button
-                        style={{
-                          marginHorizontal: wp('2%'),
-                          marginVertical: hp('4%'),
-                        }}
-                        onPress={() => onPressSubmitReview(item)}
-                        borderRadius={20}>
-                        Submit Review
-                      </Button>
-                    </View>
-                  </View>
-                </KeyboardAvoidingView>
-              </ScrollView>
-            </Modal>
             <Divider />
             <View my={2} flexDirection="row" justifyContent={'space-between'}>
               <Text color="gray.300" fontStyle={'italic'}>
@@ -533,6 +386,193 @@ const ProfileSchedules = (props: any) => {
             </View>
           </View>
         )}
+        <Modal
+          visible={modalVisible}
+          animationType="slide"
+          onRequestClose={() => setModalVisible(false)}
+          transparent={true}>
+          <ScrollView
+            scrollEnabled={true}
+            showsVerticalScrollIndicator={false}
+            style={ProfileStyle.scrollContentContainer}>
+            <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : ''}
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'column',
+              }}>
+              <View style={ProfileStyle.modelBottomSheetContainer}>
+                <View style={ProfileStyle.modelBottomSheetBgContainer}>
+                  <>
+                    <Text
+                      color="gray.500"
+                      fontWeight={'bold'}
+                      textAlign={'center'}
+                      mt={6}
+                      fontSize={18}>
+                      {questions && questions[0]?.questionText}
+                    </Text>
+                    <View style={ProfileStyle.firstQuestionStyle}>
+                      <Button
+                        style={
+                          isSelectedYes === ''
+                            ? [
+                                ProfileStyle.buttonStyle,
+                                {backgroundColor: 'grey'},
+                              ]
+                            : ProfileStyle.buttonStyle
+                        }
+                        onPress={() => handleSubmit('yesEffective')}
+                        borderRadius={20}>
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                          }}>
+                          <Text style={{color: 'white'}}>yes</Text>
+                        </View>
+                      </Button>
+                      <Button
+                        style={
+                          isSelectedNo === ''
+                            ? [
+                                ProfileStyle.buttonStyle,
+                                {backgroundColor: 'grey'},
+                              ]
+                            : ProfileStyle.buttonStyle
+                        }
+                        onPress={() => handleSubmit('NoEffective')}
+                        borderRadius={20}>
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                          }}>
+                          <Text style={{color: 'white'}}>No</Text>
+                        </View>
+                      </Button>
+                    </View>
+                  </>
+
+                  <View mb={1}>
+                    <Text
+                      color="gray.500"
+                      fontWeight={'bold'}
+                      textAlign={'center'}
+                      mt={2}
+                      fontSize={18}>
+                      {questions && questions[1]?.questionText}
+                    </Text>
+                    <AirbnbRating
+                      count={5}
+                      reviews={['Poor', 'Poor', 'Good', 'Good', 'Excellent']}
+                      defaultRating={1}
+                      size={30}
+                      onFinishRating={ratingCompleted}
+                    />
+                  </View>
+                  <View mb={1}>
+                    <Text
+                      color="gray.500"
+                      fontWeight={'bold'}
+                      textAlign={'center'}
+                      mt={2}
+                      fontSize={18}>
+                      {questions && questions[2]?.questionText}
+                    </Text>
+                    <AirbnbRating
+                      count={5}
+                      reviews={[
+                        'Difficult',
+                        'Difficult',
+                        'Okay',
+                        'Okay',
+                        'Easy',
+                      ]}
+                      defaultRating={1}
+                      size={30}
+                      onFinishRating={ratingCompletedendTime}
+                    />
+                  </View>
+                  <>
+                    <Text
+                      color="gray.500"
+                      fontWeight={'bold'}
+                      textAlign={'center'}
+                      style={{marginHorizontal: wp('5%')}}
+                      mt={2}
+                      fontSize={18}>
+                      {questions && questions[3]?.questionText}
+                    </Text>
+                    <View style={ProfileStyle.firstQuestionStyle}>
+                      <Button
+                        style={
+                          isSelectedYesSecond === ''
+                            ? [
+                                ProfileStyle.buttonStyle,
+                                {backgroundColor: 'grey'},
+                              ]
+                            : ProfileStyle.buttonStyle
+                        }
+                        onPress={() => handleSubmit('endTimeYes')}
+                        borderRadius={20}>
+                        <View style={{flexDirection: 'row'}}>
+                          <Text style={{color: 'white'}}>yes</Text>
+                        </View>
+                      </Button>
+                      <Button
+                        style={
+                          isSelectedNoSecond === ''
+                            ? [
+                                ProfileStyle.buttonStyle,
+                                {backgroundColor: 'grey'},
+                              ]
+                            : ProfileStyle.buttonStyle
+                        }
+                        onPress={() => handleSubmit('endTimeNo')}
+                        borderRadius={20}>
+                        <View style={{flexDirection: 'row'}}>
+                          <Text style={{color: 'white'}}>No</Text>
+                        </View>
+                      </Button>
+                    </View>
+                  </>
+                  <Text
+                    color="gray.500"
+                    fontWeight={'bold'}
+                    textAlign={'center'}
+                    style={{marginHorizontal: wp('5%')}}
+                    mt={2}
+                    fontSize={18}>
+                    {questions && questions[4]?.questionText}
+                  </Text>
+                  <View style={{marginHorizontal: wp('6%')}}>
+                    <Input
+                      style={{marginHorizontal: wp('2%')}}
+                      variant="underlined"
+                      placeholder="Enter Comments"
+                      autoCorrect={false}
+                      fontSize={14}
+                      onChangeText={(commentReview) =>
+                        setCommentReview(commentReview)
+                      }
+                      value={commentReview}
+                    />
+                  </View>
+                  <Button
+                    style={{
+                      marginHorizontal: wp('2%'),
+                      marginVertical: hp('4%'),
+                    }}
+                    onPress={() => onPressSubmitReview(item)}
+                    borderRadius={20}>
+                    Submit Review
+                  </Button>
+                </View>
+              </View>
+            </KeyboardAvoidingView>
+          </ScrollView>
+        </Modal>
       </View>
     );
   };

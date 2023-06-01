@@ -195,10 +195,9 @@ const MerchantDetailsScreen = (props) => {
                   </Text>
                   <View style={{flexDirection: 'row'}}>
                     <Text style={styles.textStye}>{`Ratings : `}</Text>
-                    <Text
-                      style={
-                        styles.textStye
-                      }>{`${merchant?.averageRating}`}</Text>
+                    <Text style={styles.textStye}>{`${Math.round(
+                      merchant?.averageRating,
+                    )}`}</Text>
                     {/* <Rating
                       ratingCount={5}
                       imageSize={12}
@@ -211,7 +210,7 @@ const MerchantDetailsScreen = (props) => {
                       count={5}
                       // reviewSize={2}
                       reviews={['Poor', 'Poor', 'Good', 'Good', 'Excellent']}
-                      defaultRating={merchant?.averageRating}
+                      defaultRating={Math.round(merchant?.averageRating)}
                       isDisabled={true}
                       fractions={true}
                       showRating={false}

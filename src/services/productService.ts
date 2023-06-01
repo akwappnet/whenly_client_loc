@@ -35,7 +35,7 @@ export const getClasses = (params: any) =>
   //     status: 'active',
   //   })}`,
   // );
-  axios.get(`/v1/classes?page=3`);
+  axios.get(`/v1/classes?page=4`);
 
 export const getClass = (classId: string) =>
   axios.get(`/v1/classes/${classId}`);

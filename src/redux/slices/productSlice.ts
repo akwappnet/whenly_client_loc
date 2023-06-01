@@ -98,6 +98,7 @@ export type ProductState = {
   bookings: Subscription[];
   question: Subscription[];
   latestBookingReview: Subscription[];
+  submitReviewget: Subscription[];
 };
 
 const initialState: ProductState = {
@@ -110,6 +111,7 @@ const initialState: ProductState = {
   bookings: [],
   question: [],
   latestBookingReview: [],
+  submitReviewget: [],
 };
 
 const getDragonPayToken = createAsyncThunk(
@@ -210,7 +212,7 @@ const submitReviewQuestions = createAsyncThunk(
   async (payload, {rejectWithValue}) => {
     try {
       const response = await reviewSubmit(payload);
-      console.log('reviewQuestionData', response);
+      console.log('reviewQuestionData', JSON.stringify(response));
     } catch (error: any) {
       console.log('Error', error);
       return rejectWithValue('Something went wrong. Please try again');
