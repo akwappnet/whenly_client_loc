@@ -11,7 +11,15 @@ import {
   View,
 } from 'native-base';
 import React, {useEffect, useState} from 'react';
-import {Alert, Modal, SafeAreaView, ScrollView, FlatList} from 'react-native';
+import {
+  Alert,
+  Modal,
+  SafeAreaView,
+  ScrollView,
+  FlatList,
+  RefreshControl,
+  ActivityIndicator,
+} from 'react-native';
 import EmptyListMessage from '@whenly/components/EmptyListMessage';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {convertToCurrency} from '@whenly/utils/numbers';
@@ -67,14 +75,15 @@ const dummySchedules = [
     totalAmount: 200000,
   },
 ];
+let selectedItem;
 const ProfileSchedules = (props: any) => {
   const appDispatch = useAppDispatch();
   const schedules = useSelector(selectBookings);
   const questions = useSelector(selectQuestion);
   const reviewData = useSelector(submitReviewget);
-
+  const [refreshing, setRefreshing] = useState(false);
   const latestReviewBooking = useSelector(selectLatestReviewBooking);
-  const [scheduleData, setScheduleData] = useState(schedules);
+  const [scheduleData, setScheduleData] = useState([]);
   const [expandedSched, setExpandedSched] = useState<string | null>(null);
   const [rating, setRating] = useState(0);
   const [selectedValue, setSelectedValue] = useState('');
@@ -92,36 +101,44 @@ const ProfileSchedules = (props: any) => {
   };
 
   useEffect(() => {
-    appDispatch(productActions.bookings());
+    getClassBookingData();
+    // appDispatch(productActions.bookings());
     appDispatch(productActions.reviewQuestions());
   }, [appDispatch]);
 
-  useEffect(() => {
-    // const getLatestData = () => {
-    //   appDispatch(productActions.latestBookingReview());
-    // };
-    const interval = setInterval(() => {
-      appDispatch(productActions.latestBookingReview());
-      console.log('@@@@@latestBookingReview', latestReviewBooking);
-      if (
-        !isEmptyArray(latestReviewBooking) &&
-        latestReviewBooking.length > 0
-      ) {
-        console.log('@@@@@@@@@@@@');
-        openModal();
-      } else {
-        console.log('!!!!!!!!!');
-      }
-    }, 30 * 60 * 1000); // 30 minutes in milliseconds
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     appDispatch(productActions.latestBookingReview());
+  //     console.log('@@@@@latestBookingReview', latestReviewBooking);
+  //     if (
+  //       !isEmptyArray(latestReviewBooking) &&
+  //       latestReviewBooking.length > 0
+  //     ) {
+  //       console.log('@@@@@@@@@@@@');
+  //       openModal();
+  //     } else {
+  //       console.log('!!!!!!!!!');
+  //     }
+  //   }, 30 * 60 * 1000); // 30 minutes in milliseconds
 
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
+  //   return () => {
+  //     clearInterval(interval);
+  //   };
+  // }, []);
   // // console.log('schedules', schedules, '@@@@@@@question', questions);
   useEffect(() => {
     const timer = setTimeout(() => console.log('Initial timeout!'), 1000);
   }, []);
+
+  const getClassBookingData = async () => {
+    const response = await appDispatch(productActions.bookings());
+    // console.log('@@@@@@@@responseClient', JSON.stringify(response));
+    if (!isEmptyArray(response.payload.docs)) {
+      setScheduleData(response.payload.docs);
+    } else {
+      console.log('@@@@error');
+    }
+  };
 
   const onCancel = (classId: string) => {
     Alert.alert(
@@ -190,13 +207,13 @@ const ProfileSchedules = (props: any) => {
     setReviewPageCount(reviewPageCount + 1);
   };
 
-  const onPressSubmitReview = async (item) => {
+  const onPressSubmitReview = async () => {
     try {
       const payload = {
-        bookingId: item?._id,
-        classId: item?.classId,
+        bookingId: selectedItem?._id,
+        classId: selectedItem?.classId,
         rating: rating,
-        merchantId: item?.merchant?._id,
+        merchantId: selectedItem?.merchant?._id,
         answerList: [
           {
             questionId: questions[0]?.id,
@@ -224,6 +241,7 @@ const ProfileSchedules = (props: any) => {
         productActions.submitReviewQuestions(payload),
       );
       setModalVisible(!modalVisible);
+      selectedItem = null;
       // console.log('@@@@@responseSubmitData', JSON.stringify(response));
     } catch (error) {
       console.log('Error', error);
@@ -252,9 +270,13 @@ const ProfileSchedules = (props: any) => {
     }
   };
 
-  const openModal = () => {
-    console.log('@@@@@@isModalOpen');
+  const onRefresh = () => {
+    getClassBookingData();
+  };
+
+  const openModal = (item) => {
     setModalVisible(!modalVisible);
+    selectedItem = item;
     if (modalVisible === false) {
       setIsSelectedNo('');
       setIsSelectedYes('');
@@ -262,6 +284,7 @@ const ProfileSchedules = (props: any) => {
       setIsSelectedYesSecond('');
     }
   };
+
   const renderScheduleItem = ({item}: any) => {
     const isOpen = expandedSched === item.id;
     // const {name, createdAt, startsAt} = item;
@@ -287,28 +310,29 @@ const ProfileSchedules = (props: any) => {
             <Text px={2} flex={2} numberOfLines={2} fontSize={12}>
               {`Order Date: ${moment.utc(item.createdAt).format('LL')}`}
             </Text>
-            <View flexDirection="row">
-              <Image
-                alignSelf={'center'}
-                source={require('../../assets/images/categories/ic_review.png')}
-                size={'xs'}
-                mt="2"
-                ml="2"
-                height={6}
-                width={6}
-              />
-              {item?.isReviewed === 'false' ? (
-                <Pressable onPress={openModal}>
+
+            {item?.isReviewed === false &&
+            item?.checkedIn === true &&
+            item?.status === 'completed' ? (
+              <View flexDirection="row">
+                <Image
+                  alignSelf={'center'}
+                  source={require('../../assets/images/categories/ic_review.png')}
+                  size={'xs'}
+                  mt="2"
+                  ml="2"
+                  height={6}
+                  width={6}
+                />
+                <Pressable onPress={() => openModal(item)}>
                   <Text color="gray.500" mt="2" ml="2" fontWeight={'bold'}>
                     {'Add Review'}
                   </Text>
                 </Pressable>
-              ) : (
-                <Text color="gray.500" mt="2" ml="2" fontWeight={'bold'}>
-                  {'Review Added'}
-                </Text>
-              )}
-            </View>
+              </View>
+            ) : (
+              ''
+            )}
           </View>
           {item.status === 'pending' && (
             <View flex={1}>
@@ -386,193 +410,6 @@ const ProfileSchedules = (props: any) => {
             </View>
           </View>
         )}
-        <Modal
-          visible={modalVisible}
-          animationType="slide"
-          onRequestClose={() => setModalVisible(false)}
-          transparent={true}>
-          <ScrollView
-            scrollEnabled={true}
-            showsVerticalScrollIndicator={false}
-            style={ProfileStyle.scrollContentContainer}>
-            <KeyboardAvoidingView
-              behavior={Platform.OS === 'ios' ? 'padding' : ''}
-              style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-                flexDirection: 'column',
-              }}>
-              <View style={ProfileStyle.modelBottomSheetContainer}>
-                <View style={ProfileStyle.modelBottomSheetBgContainer}>
-                  <>
-                    <Text
-                      color="gray.500"
-                      fontWeight={'bold'}
-                      textAlign={'center'}
-                      mt={6}
-                      fontSize={18}>
-                      {questions && questions[0]?.questionText}
-                    </Text>
-                    <View style={ProfileStyle.firstQuestionStyle}>
-                      <Button
-                        style={
-                          isSelectedYes === ''
-                            ? [
-                                ProfileStyle.buttonStyle,
-                                {backgroundColor: 'grey'},
-                              ]
-                            : ProfileStyle.buttonStyle
-                        }
-                        onPress={() => handleSubmit('yesEffective')}
-                        borderRadius={20}>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                          }}>
-                          <Text style={{color: 'white'}}>yes</Text>
-                        </View>
-                      </Button>
-                      <Button
-                        style={
-                          isSelectedNo === ''
-                            ? [
-                                ProfileStyle.buttonStyle,
-                                {backgroundColor: 'grey'},
-                              ]
-                            : ProfileStyle.buttonStyle
-                        }
-                        onPress={() => handleSubmit('NoEffective')}
-                        borderRadius={20}>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                          }}>
-                          <Text style={{color: 'white'}}>No</Text>
-                        </View>
-                      </Button>
-                    </View>
-                  </>
-
-                  <View mb={1}>
-                    <Text
-                      color="gray.500"
-                      fontWeight={'bold'}
-                      textAlign={'center'}
-                      mt={2}
-                      fontSize={18}>
-                      {questions && questions[1]?.questionText}
-                    </Text>
-                    <AirbnbRating
-                      count={5}
-                      reviews={['Poor', 'Poor', 'Good', 'Good', 'Excellent']}
-                      defaultRating={1}
-                      size={30}
-                      onFinishRating={ratingCompleted}
-                    />
-                  </View>
-                  <View mb={1}>
-                    <Text
-                      color="gray.500"
-                      fontWeight={'bold'}
-                      textAlign={'center'}
-                      mt={2}
-                      fontSize={18}>
-                      {questions && questions[2]?.questionText}
-                    </Text>
-                    <AirbnbRating
-                      count={5}
-                      reviews={[
-                        'Difficult',
-                        'Difficult',
-                        'Okay',
-                        'Okay',
-                        'Easy',
-                      ]}
-                      defaultRating={1}
-                      size={30}
-                      onFinishRating={ratingCompletedendTime}
-                    />
-                  </View>
-                  <>
-                    <Text
-                      color="gray.500"
-                      fontWeight={'bold'}
-                      textAlign={'center'}
-                      style={{marginHorizontal: wp('5%')}}
-                      mt={2}
-                      fontSize={18}>
-                      {questions && questions[3]?.questionText}
-                    </Text>
-                    <View style={ProfileStyle.firstQuestionStyle}>
-                      <Button
-                        style={
-                          isSelectedYesSecond === ''
-                            ? [
-                                ProfileStyle.buttonStyle,
-                                {backgroundColor: 'grey'},
-                              ]
-                            : ProfileStyle.buttonStyle
-                        }
-                        onPress={() => handleSubmit('endTimeYes')}
-                        borderRadius={20}>
-                        <View style={{flexDirection: 'row'}}>
-                          <Text style={{color: 'white'}}>yes</Text>
-                        </View>
-                      </Button>
-                      <Button
-                        style={
-                          isSelectedNoSecond === ''
-                            ? [
-                                ProfileStyle.buttonStyle,
-                                {backgroundColor: 'grey'},
-                              ]
-                            : ProfileStyle.buttonStyle
-                        }
-                        onPress={() => handleSubmit('endTimeNo')}
-                        borderRadius={20}>
-                        <View style={{flexDirection: 'row'}}>
-                          <Text style={{color: 'white'}}>No</Text>
-                        </View>
-                      </Button>
-                    </View>
-                  </>
-                  <Text
-                    color="gray.500"
-                    fontWeight={'bold'}
-                    textAlign={'center'}
-                    style={{marginHorizontal: wp('5%')}}
-                    mt={2}
-                    fontSize={18}>
-                    {questions && questions[4]?.questionText}
-                  </Text>
-                  <View style={{marginHorizontal: wp('6%')}}>
-                    <Input
-                      style={{marginHorizontal: wp('2%')}}
-                      variant="underlined"
-                      placeholder="Enter Comments"
-                      autoCorrect={false}
-                      fontSize={14}
-                      onChangeText={(commentReview) =>
-                        setCommentReview(commentReview)
-                      }
-                      value={commentReview}
-                    />
-                  </View>
-                  <Button
-                    style={{
-                      marginHorizontal: wp('2%'),
-                      marginVertical: hp('4%'),
-                    }}
-                    onPress={() => onPressSubmitReview(item)}
-                    borderRadius={20}>
-                    Submit Review
-                  </Button>
-                </View>
-              </View>
-            </KeyboardAvoidingView>
-          </ScrollView>
-        </Modal>
       </View>
     );
   };
@@ -581,12 +418,197 @@ const ProfileSchedules = (props: any) => {
     <ProfileContainer
       title="My Schedule"
       subtitle="These are the classes or appointments you booked.">
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+        transparent={true}>
+        <ScrollView
+          scrollEnabled={true}
+          showsVerticalScrollIndicator={false}
+          style={ProfileStyle.scrollContentContainer}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : ''}
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexDirection: 'column',
+            }}>
+            <View style={ProfileStyle.modelBottomSheetContainer}>
+              <View style={ProfileStyle.modelBottomSheetBgContainer}>
+                <>
+                  <Text
+                    color="gray.500"
+                    fontWeight={'bold'}
+                    textAlign={'center'}
+                    mt={6}
+                    fontSize={18}>
+                    {questions && questions[0]?.questionText}
+                  </Text>
+                  <View style={ProfileStyle.firstQuestionStyle}>
+                    <Button
+                      style={
+                        isSelectedYes === ''
+                          ? [
+                              ProfileStyle.buttonStyle,
+                              {backgroundColor: 'grey'},
+                            ]
+                          : ProfileStyle.buttonStyle
+                      }
+                      onPress={() => handleSubmit('yesEffective')}
+                      borderRadius={20}>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                        }}>
+                        <Text style={{color: 'white'}}>yes</Text>
+                      </View>
+                    </Button>
+                    <Button
+                      style={
+                        isSelectedNo === ''
+                          ? [
+                              ProfileStyle.buttonStyle,
+                              {backgroundColor: 'grey'},
+                            ]
+                          : ProfileStyle.buttonStyle
+                      }
+                      onPress={() => handleSubmit('NoEffective')}
+                      borderRadius={20}>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                        }}>
+                        <Text style={{color: 'white'}}>No</Text>
+                      </View>
+                    </Button>
+                  </View>
+                </>
+
+                <View mb={1}>
+                  <Text
+                    color="gray.500"
+                    fontWeight={'bold'}
+                    textAlign={'center'}
+                    mt={2}
+                    fontSize={18}>
+                    {questions && questions[1]?.questionText}
+                  </Text>
+                  <AirbnbRating
+                    count={5}
+                    reviews={['Poor', 'Poor', 'Good', 'Good', 'Excellent']}
+                    defaultRating={1}
+                    size={30}
+                    onFinishRating={ratingCompleted}
+                  />
+                </View>
+                <View mb={1}>
+                  <Text
+                    color="gray.500"
+                    fontWeight={'bold'}
+                    textAlign={'center'}
+                    mt={2}
+                    fontSize={18}>
+                    {questions && questions[2]?.questionText}
+                  </Text>
+                  <AirbnbRating
+                    count={5}
+                    reviews={['Difficult', 'Difficult', 'Okay', 'Okay', 'Easy']}
+                    defaultRating={1}
+                    size={30}
+                    onFinishRating={ratingCompletedendTime}
+                  />
+                </View>
+                <>
+                  <Text
+                    color="gray.500"
+                    fontWeight={'bold'}
+                    textAlign={'center'}
+                    style={{marginHorizontal: wp('5%')}}
+                    mt={2}
+                    fontSize={18}>
+                    {questions && questions[3]?.questionText}
+                  </Text>
+                  <View style={ProfileStyle.firstQuestionStyle}>
+                    <Button
+                      style={
+                        isSelectedYesSecond === ''
+                          ? [
+                              ProfileStyle.buttonStyle,
+                              {backgroundColor: 'grey'},
+                            ]
+                          : ProfileStyle.buttonStyle
+                      }
+                      onPress={() => handleSubmit('endTimeYes')}
+                      borderRadius={20}>
+                      <View style={{flexDirection: 'row'}}>
+                        <Text style={{color: 'white'}}>yes</Text>
+                      </View>
+                    </Button>
+                    <Button
+                      style={
+                        isSelectedNoSecond === ''
+                          ? [
+                              ProfileStyle.buttonStyle,
+                              {backgroundColor: 'grey'},
+                            ]
+                          : ProfileStyle.buttonStyle
+                      }
+                      onPress={() => handleSubmit('endTimeNo')}
+                      borderRadius={20}>
+                      <View style={{flexDirection: 'row'}}>
+                        <Text style={{color: 'white'}}>No</Text>
+                      </View>
+                    </Button>
+                  </View>
+                </>
+                <Text
+                  color="gray.500"
+                  fontWeight={'bold'}
+                  textAlign={'center'}
+                  style={{marginHorizontal: wp('5%')}}
+                  mt={2}
+                  fontSize={18}>
+                  {questions && questions[4]?.questionText}
+                </Text>
+                <View style={{marginHorizontal: wp('6%')}}>
+                  <Input
+                    style={{marginHorizontal: wp('2%')}}
+                    variant="underlined"
+                    placeholder="Enter Comments"
+                    autoCorrect={false}
+                    fontSize={14}
+                    onChangeText={(commentReview) =>
+                      setCommentReview(commentReview)
+                    }
+                    value={commentReview}
+                  />
+                </View>
+                <Button
+                  style={{
+                    marginHorizontal: wp('2%'),
+                    marginVertical: hp('4%'),
+                  }}
+                  onPress={onPressSubmitReview}
+                  borderRadius={20}>
+                  Submit Review
+                </Button>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
+        </ScrollView>
+      </Modal>
       <Card>
+        {refreshing ? <ActivityIndicator /> : null}
         <FlatList
-          data={schedules}
+          data={scheduleData}
           renderItem={renderScheduleItem}
           style={{height: hp('70%')}}
           keyExtractor={(item, index) => index.toString()}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
           ListEmptyComponent={
             <EmptyListMessage message="You have not booked any classes or appointments yet." />
           }

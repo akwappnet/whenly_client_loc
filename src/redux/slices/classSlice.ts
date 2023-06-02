@@ -63,7 +63,6 @@ const classes = createAsyncThunk(
   async (payload: any, {rejectWithValue}) => {
     try {
       const response = await getClasses(payload);
-
       console.log('fetching classes', response);
       return response?.data;
     } catch (error) {

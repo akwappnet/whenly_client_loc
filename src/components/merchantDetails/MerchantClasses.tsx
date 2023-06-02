@@ -50,8 +50,6 @@ const MerchantClasses = ({merchant}: ClassesProps) => {
     isSameDay(new Date(c.startsAt), new Date(selectedDate)),
   );
 
-  console.log('@@@@@filteredClass', filteredClasses);
-
   return (
     <VStack>
       <CalendarStrip
