@@ -42,8 +42,8 @@ const AboutMerchant = ({user}: AboutMerchantProps) => {
   const [visibleReviews, setVisibleReviews] = useState([]);
   const [showAll, setShowAll] = useState(false);
   console.log('@@@@merchantData', merchant);
-  const [latitude, setLatitude] = useState(null);
-  const [longitude, setLongitude] = useState(null);
+  const [latitude, setLatitude] = useState();
+  const [longitude, setLongitude] = useState();
   const navigation = useNavigation();
 
   const contactLabelStyles = {
@@ -57,8 +57,8 @@ const AboutMerchant = ({user}: AboutMerchantProps) => {
   };
 
   useEffect(() => {
-    setLatitude(user?.address[0]?.lat);
-    setLongitude(user?.address[0]?.long);
+    setLatitude(user?.address[0] ? user?.address[0]?.lat : 0.0);
+    setLongitude(user?.address[0] ? user?.address[0]?.long : 0.0);
     getReviewAnswerApi(merchant?.id);
   }, []);
 
