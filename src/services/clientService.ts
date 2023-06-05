@@ -14,6 +14,5 @@ export const postUpdateClient = (payload: Partial<User>) => {
 };
 
 export const reviewSubmit = (payload: any) => {
-  console.log('payLoadData', payload);
   return axios.post(`/v1/review/`, payload);
 };

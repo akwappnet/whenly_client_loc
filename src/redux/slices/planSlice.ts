@@ -61,7 +61,6 @@ const plans = createAsyncThunk(
   async (merchantId: string, {rejectWithValue}) => {
     try {
       const response = await getPlans({createdBy: merchantId});
-      console.log('@@@responsePlans', JSON.stringify(response));
       return response?.data;
     } catch (error) {
       console.log('Error fetching plans', error);
@@ -105,8 +104,6 @@ const subscribeToPlan = createAsyncThunk(
     try {
       const {plan} = getState();
       const planid = plan.plan._id;
-
-      console.log('@@@@@payload', payload);
       console.log(
         '@@@@@payloadDataSub',
         payload.referenceNo,
@@ -124,9 +121,6 @@ const subscribeToPlan = createAsyncThunk(
         referenceNo,
         transactionId: txnId,
       });
-
-      console.log('@@@@responseSubUnder', JSON.stringify(response));
-
       return response?.data;
     } catch (error) {
       return rejectWithValue(error);

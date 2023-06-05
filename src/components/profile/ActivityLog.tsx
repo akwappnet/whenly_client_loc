@@ -26,7 +26,6 @@ const ActivityLog = () => {
   const getActivityApiCall = async () => {
     setLoadMoreLoading(true);
     const response = await appDispatch(authActions.getActivityListApi(page));
-    console.log('@@@@@responsenew', JSON.stringify(response));
     if (!isEmptyArray(response.payload.data.docs)) {
       setLoadMoreLoading(false);
       setActivities(response.payload.data.docs);

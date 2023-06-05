@@ -48,7 +48,6 @@ const PaymentWebvew = (props) => {
       if (finished) {
         console.log('Status', status);
         // Pending , Success
-        console.log('@@@@Params:-', referenceNo, route.params?.txnId, status);
         if (['P', 'S'].includes(status)) {
           const response = await appDispatch(
             planActions.subscribeToPlan({
@@ -57,7 +56,6 @@ const PaymentWebvew = (props) => {
               status,
             }),
           );
-          console.log('@@@@@responseSub', response);
           if (response.type.includes('fulfilled')) {
             appDispatch(productActions.subscriptions());
             navigation.replace('Success', {type: PLAN});
@@ -81,11 +79,9 @@ const PaymentWebvew = (props) => {
           status,
           subscription,
         };
-        console.log('handleBooking', payload);
         // Pending , Success
         if (['P', 'S'].includes(status)) {
           const response = await appDispatch(classActions.book(payload));
-          console.log('@@@@@responseBooking', response);
 
           if (response.type.includes('fulfilled')) {
             appDispatch(productActions.bookings());
@@ -130,17 +126,14 @@ const PaymentWebvew = (props) => {
           console.log('navState', navState);
           // FOR TESTING PURPOSES
           if (navState.url.startsWith('https://staging.app.whenly.ph')) {
-            console.log('-------------------------------');
             // if (navState.url.startsWith(APP_URL)) {
             setFinished(true); // to prevent calling twice
             const params = queryString.parse(navState.url);
             // console.log('QS', params);
             const referenceNo = extractFromURL(navState.url);
             if (route.params.type === PLAN) {
-              console.log('@@@@plan');
               handleSubscription(params?.refno, params?.status);
             } else {
-              console.log('@@@@Booking');
               handleBooking(params?.refno, params?.status);
             }
           }

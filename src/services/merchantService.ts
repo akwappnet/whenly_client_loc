@@ -11,7 +11,6 @@ export const getMerchants = (payload: any) =>
       visible: false,
       limit: 9999,
     })}`,
-    console.log('@@@@2payloadData', payload),
   );
 
 export const getMerchant = (merchantId: string) =>

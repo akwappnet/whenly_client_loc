@@ -48,10 +48,8 @@ To see your upcoming class and manage your schedule, simply head over to the "Sc
         <Button
           onPress={() => {
             if (type === 'classes') {
-              console.log('@@@@class');
               navigation.replace('Schedule');
             } else {
-              console.log('@@@@Details');
               navigation.navigate('Details', {from: 'success', type});
             }
           }}>

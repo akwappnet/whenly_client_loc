@@ -68,7 +68,6 @@ const MerchantDetailsScreen = (props) => {
     if (merchant?.id) {
       appDispatch(planActions.plans(merchant.id));
       // appDispatch(classActions.classes(merchant.id));
-      console.log('@@@@@merchanteLat', merchant);
     }
   }, []);
 
@@ -79,8 +78,6 @@ const MerchantDetailsScreen = (props) => {
       }
     }, [from, type]),
   );
-
-  console.log('Merchant', merchant);
 
   const content = useMemo(() => {
     switch (activeTab) {

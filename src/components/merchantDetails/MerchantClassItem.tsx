@@ -35,7 +35,6 @@ const MerchantClassItem = ({classData, showMerchant}: ClassItemProps) => {
   const end = moment.utc(classData.endsAt);
 
   const duration = moment.duration(start.diff(end));
-  console.log('@@@classData', JSON.stringify(classData), classData.price);
   const subscription = SubscriptionTag(classData.tags.toLowerCase());
   const viaSubscription = subscription?.sessions > 0;
   console.log('@@@@viaSub', viaSubscription);

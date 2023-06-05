@@ -172,7 +172,6 @@ const reviewQuestions = createAsyncThunk(
   async (_, {rejectWithValue}) => {
     try {
       const response = await getReviewQuestion();
-      console.log('reviewQuestion', response);
       return response?.data;
     } catch (error) {
       return rejectWithValue(error.message || error);
@@ -183,10 +182,8 @@ const reviewQuestions = createAsyncThunk(
 const getReviewData = createAsyncThunk(
   joinWithSlash(CLIENT, 'getReviewData'),
   async (params) => {
-    console.log('@@@@paramsClientClass', params);
     try {
       const response = await getReviewDataDetail(params);
-      console.log('@@@responseReviewData', JSON.stringify(response));
       return response?.data;
     } catch (error) {
       console.log('Error', error);
@@ -199,7 +196,6 @@ const latestBookingReview = createAsyncThunk(
   async (_, {rejectWithValue}) => {
     try {
       const response = await getLatestBookingReview();
-      console.log('lastestBooking', JSON.stringify(response));
       return response?.data;
     } catch (error) {
       return rejectWithValue(error.message || error);
@@ -212,7 +208,6 @@ const submitReviewQuestions = createAsyncThunk(
   async (payload, {rejectWithValue}) => {
     try {
       const response = await reviewSubmit(payload);
-      console.log('reviewQuestionData', JSON.stringify(response));
     } catch (error: any) {
       console.log('Error', error);
       return rejectWithValue('Something went wrong. Please try again');

@@ -132,7 +132,6 @@ const ProfileSchedules = (props: any) => {
 
   const getClassBookingData = async () => {
     const response = await appDispatch(productActions.bookings());
-    // console.log('@@@@@@@@responseClient', JSON.stringify(response));
     if (!isEmptyArray(response.payload.docs)) {
       setScheduleData(response.payload.docs);
     } else {
@@ -172,7 +171,6 @@ const ProfileSchedules = (props: any) => {
   };
 
   const ratingCompleted = (rating) => {
-    console.log('Rating is: ' + rating);
     setRating(rating);
     const reviews = ['Poor', 'Poor', 'Good', 'Good', 'Excellent'];
     const selectedReview = reviews[rating - 1];
@@ -249,7 +247,6 @@ const ProfileSchedules = (props: any) => {
   };
 
   const openGoogleMeetLink = async (meetLink) => {
-    console.log('meeet', meetLink);
     try {
       // Check if the Linking API is supported on the device
       // const supported = await Linking.canOpenURL(meetLink);

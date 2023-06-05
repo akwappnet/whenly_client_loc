@@ -83,7 +83,6 @@ const ProfilePasses = (props: any) => {
   function renderScheduleItem({item}: any) {
     const isOpen = expandedSched === item.id;
     const {name, description, createdAt, duration} = item.productDetails;
-    console.log('renderScheduleItem', item);
     return (
       <Box py={6}>
         <Box flexDirection={'row'}>

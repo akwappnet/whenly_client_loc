@@ -41,7 +41,6 @@ const AboutMerchant = ({user}: AboutMerchantProps) => {
   const [reviewData, setReviewData] = useState([]);
   const [visibleReviews, setVisibleReviews] = useState([]);
   const [showAll, setShowAll] = useState(false);
-  console.log('@@@@merchantData', merchant);
   const [latitude, setLatitude] = useState();
   const [longitude, setLongitude] = useState();
   const navigation = useNavigation();
@@ -88,13 +87,11 @@ const AboutMerchant = ({user}: AboutMerchantProps) => {
       } else {
         console.log('else');
       }
-      // console.log('@@@@@reviewData', JSON.stringify(response.payload.length));
     } catch (error) {
       console.log('@@@@@@@@@@@@error', error);
     }
   };
   const renderReviewData = ({item}) => {
-    // console.log('@@@@@@ansDAta', JSON.stringify(item?.answerList.length));
     return (
       <View style={styles.Viewcontainer}>
         <View style={{paddingTop: 12}}>
