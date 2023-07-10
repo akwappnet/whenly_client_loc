@@ -175,13 +175,11 @@ const ProfileSchedules = (props: any) => {
     const reviews = ['Poor', 'Poor', 'Good', 'Good', 'Excellent'];
     const selectedReview = reviews[rating - 1];
     setSelectedValue(selectedReview);
-    console.log('Selected review:', selectedReview);
   };
 
   const ratingCompletedendTime = (rating) => {
     const reviews = ['Difficult', 'Difficult', 'Okay', 'Okay', 'Easy'];
     const selectedReview = reviews[rating - 1];
-    console.log('Selected review:second', selectedReview);
     setSelectedEndTimeValue(selectedReview);
   };
 
@@ -240,7 +238,6 @@ const ProfileSchedules = (props: any) => {
       );
       setModalVisible(!modalVisible);
       selectedItem = null;
-      // console.log('@@@@@responseSubmitData', JSON.stringify(response));
     } catch (error) {
       console.log('Error', error);
     }
@@ -248,17 +245,7 @@ const ProfileSchedules = (props: any) => {
 
   const openGoogleMeetLink = async (meetLink) => {
     try {
-      // Check if the Linking API is supported on the device
-      // const supported = await Linking.canOpenURL(meetLink);
-
-      // if (supported) {
-      // Open the Google Meet link
       await Linking.openURL(meetLink);
-      // } else {
-      //   console.log(
-      //     'Opening Google Meet links is not supported on this device.',
-      //   );
-      // }
     } catch (error) {
       console.log(
         'An error occurred while opening the Google Meet link:',
@@ -284,8 +271,6 @@ const ProfileSchedules = (props: any) => {
 
   const renderScheduleItem = ({item}: any) => {
     const isOpen = expandedSched === item.id;
-    // const {name, createdAt, startsAt} = item;
-    // console.log(item);
     return (
       <View>
         <View flexDirection={'row'} style={{marginVertical: hp('2%')}}>

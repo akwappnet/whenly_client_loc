@@ -1,5 +1,5 @@
 import {View, Text} from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet} from 'react-native';
 import {Dimensions} from 'react-native';
 import {
@@ -10,10 +10,20 @@ import HeaderBar from '@whenly/components/HeaderBar';
 import MapView, {Marker} from 'react-native-maps';
 const ViewMapFullScreen = (props) => {
   const {navigation, route} = props;
-  const [latitude, setLatitude] = useState(route?.params?.User?.address[0].lat);
-  const [longitude, setLongitude] = useState(
-    route?.params?.User?.address[0].long,
-  );
+  const [latitude, setLatitude] = useState();
+  const [longitude, setLongitude] = useState();
+  useEffect(() => {
+    setLatitude(
+      route?.params?.User?.address[0]?.lat
+        ? route?.params?.User?.address[0]?.lat
+        : 0.0,
+    );
+    setLongitude(
+      route?.params?.User?.address[0]?.long
+        ? route?.params?.User?.address[0]?.long
+        : 0.0,
+    );
+  }, []);
   return (
     <View style={styles.container}>
       <HeaderBar white onBack={() => navigation.goBack()} title="" />

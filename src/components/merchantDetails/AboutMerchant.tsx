@@ -8,7 +8,7 @@ import {
 } from '@whenly/redux';
 import Collapse from '@whenly/components/Collapse';
 import {capitalizeFirstLetter} from '@whenly/utils/string';
-import {StyleSheet} from 'react-native';
+import {Linking, StyleSheet} from 'react-native';
 import {Dimensions} from 'react-native';
 import {View} from 'react-native';
 import MapView, {Marker} from 'react-native-maps';
@@ -26,6 +26,7 @@ import {Divider} from 'native-base';
 import EmptyListMessage from '@whenly/components/EmptyListMessage';
 import {AirbnbRating} from 'react-native-ratings';
 import {useSelector} from 'react-redux';
+import {Platform} from 'react-native';
 interface AboutMerchantProps {
   merchant: Merchant | null;
 }
@@ -162,9 +163,16 @@ const AboutMerchant = ({user}: AboutMerchantProps) => {
                   justifyContent: 'center',
                 }}>
                 <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate('ViewMapFullScreen', {User: user})
-                  }>
+                  onPress={() => {
+                    // navigation.navigate('ViewMapFullScreen', {User: user})
+                    if (Platform.OS === 'android') {
+                      const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+                      Linking.openURL(googleMapsUrl);
+                    } else if (Platform.OS === 'ios') {
+                      const appleMapsUrl = `http://maps.apple.com/?ll=${latitude},${longitude}`;
+                      Linking.openURL(appleMapsUrl);
+                    }
+                  }}>
                   <Image
                     source={require('../../assets/images/categories/ic_full_map.png')}
                     resizeMode="contain"
