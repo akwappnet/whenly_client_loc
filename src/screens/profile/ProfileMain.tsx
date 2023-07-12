@@ -1,24 +1,21 @@
 import React from 'react';
-import {
-  Avatar,
-  Button,
-  Center,
-  Heading,
-  HStack,
-  VStack,
-} from 'native-base';
+import {Avatar, Button, Center, Heading, HStack, VStack} from 'native-base';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import NavigationButton from '@whenly/components/dashboard/profile/NavigationButton';
 import HeaderBar from '@whenly/components/HeaderBar';
 import {useAppDispatch, selectAuthState} from '@whenly/redux';
 import {useSelector} from 'react-redux';
 import ActivityLog from '@whenly/components/profile/ActivityLog';
+import {API_URL} from '@env';
 
 const ProfileMain = (props: any) => {
   const {user} = useSelector(selectAuthState);
   const appDispatch = useAppDispatch();
   // const navigation = useNavigation()
-
+  // const apiurl = API_URL;
+  // const path = user?.profilePicture.split('/')[4];
+  // const uploadFolder = user?.profilePicture.split('/')[3];
+  // const combinedPath = `${apiurl}/${uploadFolder}/${path}`;
   return (
     <SafeAreaView>
       <HeaderBar

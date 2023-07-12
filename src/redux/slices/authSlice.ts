@@ -116,9 +116,7 @@ const updateUser = createAsyncThunk(
         ...rest,
         profilePicture: avatar,
       };
-      console.log('updatedPayload', updatedPayload);
       const response = await postUpdateClient(updatedPayload);
-      console.log('TEST', response);
       successToast('Success', 'Account updated successful');
       return response?.data;
     } catch (error) {
@@ -303,7 +301,6 @@ const getActivityListApi = createAsyncThunk(
   async (page) => {
     try {
       const response = await getActivityList(page);
-      console.log('@@@response', JSON.stringify(response));
       return response?.data;
     } catch (error) {
       console.log('Error', error);

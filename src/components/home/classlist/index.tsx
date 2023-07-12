@@ -80,7 +80,6 @@ const ClassList = () => {
             <HStack space={8} px={'20px'}>
               {docs.length > 0 ? (
                 docs.map((merchant: Merchant) => {
-                  console.log('Merchant Details', merchant);
                   const roundedDistance =
                     Math.round((merchant.distance / 1000) * 100) / 100;
                   return (

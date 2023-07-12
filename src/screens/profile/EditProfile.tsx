@@ -83,7 +83,7 @@ const EditProfile = (props: any) => {
         address: [address],
         profileUpload: imageUpload,
       };
-      console.log('Payload', payload);
+      // console.log('Payload', payload);
       appDispatch(authActions.updateUser(payload as Partial<User>))
         .then(() => {
           successToast('Success', 'Successfully updated profile details');

@@ -74,9 +74,7 @@ const merchants = createAsyncThunk(
   joinWithSlash(MERCHANT, 'merchants'),
   async (payload: any, {rejectWithValue}) => {
     try {
-      console.log('merchants payload', payload);
       const response = await getMerchants(payload);
-      console.log('FETCHING MERCHANTS', response);
       return response?.data;
     } catch (error) {
       console.log('Error fetching merchants', error);

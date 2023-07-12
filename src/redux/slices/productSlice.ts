@@ -159,7 +159,6 @@ const bookings = createAsyncThunk(
     try {
       const response = await getBookings();
 
-      console.log('BOOKINGS', response);
       return response?.data;
     } catch (error) {
       return rejectWithValue(error.message || error);

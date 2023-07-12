@@ -52,7 +52,7 @@ const PrimaryInformation = (props: FormikProps<ProfileFormValues>) => {
           <FormControl.ErrorMessage>{errors.lastName}</FormControl.ErrorMessage>
         </FormControl>
         <FormControl
-          isDisabled={true}
+          isDisabled={false}
           isInvalid={errors.phoneNumber && touched.phoneNumber ? true : false}>
           <FormControl.Label m="0" _text={{fontSize: 'xs'}}>
             Contact Number
