@@ -11,7 +11,7 @@ import {
   Text,
   VStack,
 } from 'native-base';
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {
   planActions,
@@ -39,14 +39,18 @@ import {
 } from '@whenly/components/merchantDetails';
 import Carousel from 'react-native-snap-carousel';
 import {metric} from '@whenly/theme/theme';
+import {useFocusEffect} from '@react-navigation/native';
+import {AirbnbRating, Rating} from 'react-native-ratings';
+import {StyleSheet} from 'react-native';
 
 const {height, width} = Dimensions.get('screen');
 
 const dummyPhoto =
   'https://images.unsplash.com/photo-1596357395217-80de13130e92?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1771&q=80';
 
-const MerchantDetailsScreen = (props: DetailsScreenNavigationProp) => {
-  const {navigation} = props;
+const MerchantDetailsScreen = (props) => {
+  const {navigation, route} = props;
+  const {from, type} = route?.params || {};
   const insets = useSafeAreaInsets();
   const appDispatch = useAppDispatch();
   const {user} = useSelector(selectAuthState);
@@ -62,20 +66,26 @@ const MerchantDetailsScreen = (props: DetailsScreenNavigationProp) => {
   useEffect(() => {
     if (merchant?.id) {
       appDispatch(planActions.plans(merchant.id));
-      appDispatch(classActions.classes(merchant.id));
+      // appDispatch(classActions.classes(merchant.id));
     }
   }, []);
 
-  console.log('Merchant', merchant);
+  useFocusEffect(
+    useCallback(() => {
+      if (from === 'success' && type === 'plan') {
+        setActiveTab(2);
+      }
+    }, [from, type]),
+  );
 
   const content = useMemo(() => {
     switch (activeTab) {
       case 0:
-        return <AboutMerchant merchant={merchant} />;
+        return <AboutMerchant merchant={merchant?._id} user={user} />;
       case 1:
         return <MerchantPackages plans={docs} />;
       case 2:
-        return <MerchantClasses classes={classes} />;
+        return <MerchantClasses merchant={merchant} classes={classes} />;
       default:
         return <AboutMerchant merchant={merchant} />;
     }
@@ -109,11 +119,9 @@ const MerchantDetailsScreen = (props: DetailsScreenNavigationProp) => {
         }),
       );
     } catch (err) {
-      console.log('Err', err);
+      console.log('error@toggleFavorite', err);
     }
   };
-
-  console.log('isFavorite', isFavorite);
 
   return (
     <View>
@@ -177,8 +185,32 @@ const MerchantDetailsScreen = (props: DetailsScreenNavigationProp) => {
                 <Box pl={4} flex={1} pr={4}>
                   <Text fontWeight="bold">{merchant?.companyName}</Text>
                   <Text fontSize={11} color="gray.500" numberOfLines={3}>
-                    {merchant?.address[0]?.address}
+                    {user?.address[0]?.address}
                   </Text>
+                  <View style={{flexDirection: 'row'}}>
+                    <Text style={styles.textStye}>{`Ratings : `}</Text>
+                    <Text style={styles.textStye}>{`${Math.round(
+                      merchant?.averageRating,
+                    )}`}</Text>
+                    {/* <Rating
+                      ratingCount={5}
+                      imageSize={12}
+                      minValue={4.5}
+                      fractions={true}
+                      // defaultRating={4.5}
+                      readonly
+                    /> */}
+                    <AirbnbRating
+                      count={5}
+                      // reviewSize={2}
+                      reviews={['Poor', 'Poor', 'Good', 'Good', 'Excellent']}
+                      defaultRating={Math.round(merchant?.averageRating)}
+                      isDisabled={true}
+                      fractions={true}
+                      showRating={false}
+                      size={12}
+                    />
+                  </View>
                 </Box>
               </Box>
               <HStack space={2} my={4}>
@@ -245,3 +277,11 @@ const MerchantDetailsScreen = (props: DetailsScreenNavigationProp) => {
 };
 
 export default MerchantDetailsScreen;
+
+export const styles = StyleSheet.create({
+  textStye: {
+    fontWeight: 'bold',
+    fontSize: 12,
+    color: 'black',
+  },
+});

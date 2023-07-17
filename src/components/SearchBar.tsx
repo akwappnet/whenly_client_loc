@@ -1,6 +1,7 @@
 import React from 'react';
 import {Input, Icon, Box, Center} from 'native-base';
 import Octicons from 'react-native-vector-icons/Octicons';
+import {TextInputProps} from 'react-native';
 
 interface SearchBarProps {
   onChangeText: (text: string) => void;
@@ -8,19 +9,25 @@ interface SearchBarProps {
   value: string;
 }
 
-const SearchBar = ({onChangeText, placeholder, value}: SearchBarProps) => {
+const SearchBar = ({
+  onChangeText,
+  placeholder,
+  value,
+  ...rest
+}: TextInputProps) => {
   return (
     <Center
       shadow={5}
       backgroundColor="white"
       w="100%"
       h="40px"
-      borderRadius="2xl">
+      borderRadius="xl">
       <Input
         variant="unstyled"
         onChangeText={onChangeText}
         placeholder={placeholder}
         value={value}
+        {...rest}
         InputLeftElement={
           <Icon
             as={<Octicons name="search" />}

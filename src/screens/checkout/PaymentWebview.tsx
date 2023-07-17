@@ -1,95 +1,146 @@
+import React, {useCallback, useEffect, useState} from 'react';
 import HeaderBar from '@whenly/components/HeaderBar';
 import {CLASSES, PLAN} from '@whenly/constants';
-import {useCallback, useState} from 'react';
-import {SafeAreaView} from 'react-native';
 import {WebView} from 'react-native-webview';
 
 import {
   useAppDispatch,
-  planActions,
   selectProductState,
   selectPlanState,
   productActions,
   classActions,
 } from '@whenly/redux';
 import {useSelector} from 'react-redux';
-import FullpageLoading from '@whenly/components/FullpageLoading';
+import LoadingIndicator from '@whenly/components/LoadingIndicator';
+import {APP_URL} from '@env';
+import {Flex} from 'native-base';
+import queryString from 'querystring';
+import {v4 as UuidV4} from 'uuid';
 
-const PaymentWebvew = (props) => {
+const dragonPayStatuses = ['P', 'S'];
+const xenditStatuses = ['PENDING', 'PAID']; // PENDING,PAID,EXPIRED
+
+const PaymentWebview = (props) => {
   const {navigation, route} = props;
   const [finished, setFinished] = useState(false);
   const {loading} = useSelector(selectProductState);
   const {loading: loadingPlan} = useSelector(selectPlanState);
+  const [loadingWeb, setLoadingWeb] = useState(false);
+  const {
+    txnId,
+    metadata,
+    url: checkoutURL,
+    type: checkoutType,
+  } = route?.params || {};
 
   const appDispatch = useAppDispatch();
 
-  const extractFromURL = (str: string) => {
-    var result = '';
-
-    const s = str.split('&');
-    var i = 0;
-    for (i = 0; i < s.length; i++) {
-      const value = s[i].split('=');
-      if (value[0] == 'digest') {
-        // match
-        result = value[1];
-        break;
-      }
-    }
-    return result;
-  };
-
   const handleSubscription = useCallback(
-    async (referenceNo: string) => {
+    async (referenceNo: string, status: string) => {
       if (finished) {
-        const response = await appDispatch(
-          planActions.subscribeToPlan(referenceNo),
-        );
-        if (response.type.includes('fulfilled')) {
-          appDispatch(productActions.invoice(response.payload.invoiceId));
+        if ([...dragonPayStatuses, ...xenditStatuses].includes(status)) {
           appDispatch(productActions.subscriptions());
-          navigation.push('Success', {type: PLAN});
+          setTimeout(() => {
+            navigation.replace('Success', {type: PLAN});
+          }, 200);
+        } else {
+          navigation.goBack();
         }
       }
     },
-    [finished],
+    [appDispatch, finished, navigation],
   );
-  const handleBooking = useCallback(
-    async (referenceNo: string) => {
-      if (finished) {
-        const response = await appDispatch(classActions.book(referenceNo));
 
-        if (response.type.includes('fulfilled')) {
-          appDispatch(productActions.invoice(response.payload.invoiceId));
+  const handleBooking = useCallback(
+    async (referenceNo: string, status: string, subscription?: string) => {
+      if (finished) {
+        const payload = {
+          referenceNo,
+          txnId: txnId,
+          status,
+          subscription,
+        };
+
+        if (['paid'].includes(status)) {
+          const response = await appDispatch(classActions.book(payload));
+          if (response.type.includes('fulfilled')) {
+            appDispatch(productActions.bookings());
+            setTimeout(() => {
+              navigation.replace('Success', {type: CLASSES});
+            }, 200);
+          }
+        } else {
           appDispatch(productActions.bookings());
-          navigation.push('Success', {type: CLASSES});
+          setTimeout(() => {
+            navigation.replace('Success', {type: CLASSES});
+          }, 200);
+          // navigation.goBack();
         }
       }
     },
-    [finished],
+    [appDispatch, finished, navigation, txnId],
   );
+
+  useEffect(() => {
+    const {subscription, type} = route.params;
+    // check subscription if still have free sessions
+    if (
+      subscription &&
+      ((subscription && subscription?.sessions > 0) ||
+        (subscription?.sessions === -1 && type === CLASSES))
+    ) {
+      setFinished(true);
+      handleBooking(UuidV4(), 'paid', subscription.id);
+    }
+  }, [handleBooking, route.params]);
 
   return (
-    <SafeAreaView style={{flex: 1}}>
-      <FullpageLoading visible={loading || loadingPlan} />
-      <HeaderBar onBack={() => navigation.goBack()} title="" />
+    <Flex flex={1} bg="white" safeArea>
+      <LoadingIndicator visible={loading || loadingPlan} />
+      <HeaderBar
+        onBack={() => {
+          if (!loading && !loadingPlan && !loadingWeb) {
+            navigation.goBack();
+          }
+        }}
+        title=""
+      />
       <WebView
-        source={{uri: route.params?.url}}
+        source={{uri: checkoutURL}}
         onNavigationStateChange={(navState) => {
-          console.log(navState);
-          if (navState.url.includes('https://staging.app.whenly.ph')) {
+          setLoadingWeb(navState.loading);
+          // FOR TESTING PURPOSES
+          const isTester = 'https://staging.app.whenly.ph'; // dragon pay is set to redirect on staging
+          if (
+            navState.url.startsWith(APP_URL) ||
+            navState.url.startsWith(isTester)
+          ) {
+            // if (navState.url.startsWith(APP_URL)) {
             setFinished(true); // to prevent calling twice
-            const referenceNo = extractFromURL(navState.url);
-            if (route.params.type === PLAN) {
-              handleSubscription(referenceNo);
+
+            const params = queryString.parse(navState.url);
+            if (params?.refno) {
+              // Redirect from dragonpay
+              // console.log('redirect from dragonpay');
+              if (checkoutType === PLAN) {
+                handleSubscription(params?.refno, params?.status);
+              } else {
+                handleBooking(params?.refno, params?.status);
+              }
             } else {
-              handleBooking(referenceNo);
+              // Redirect from xendit
+              // console.log('redirect from xendit');
+              if (checkoutType === PLAN) {
+                handleSubscription(metadata.id, metadata.status);
+              } else {
+                handleBooking(metadata.id, metadata.status);
+              }
             }
           }
         }}
       />
-    </SafeAreaView>
+    </Flex>
   );
 };
 
-export default PaymentWebvew;
+export default PaymentWebview;

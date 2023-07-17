@@ -5,7 +5,12 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from 'react';
-import {StyleSheet, PermissionsAndroid, Platform} from 'react-native';
+import {
+  StyleSheet,
+  PermissionsAndroid,
+  Platform,
+  Pressable,
+} from 'react-native';
 import Container from '@whenly/components/ContainerHOC';
 import {
   Avatar,
@@ -21,8 +26,11 @@ import {
   Box,
   FormControl,
   FlatList,
+  Icon,
 } from 'native-base';
 import Card from '@whenly/components/Card';
+
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {useSelector} from 'react-redux';
 import {selectCurrentUser} from '@whenly/redux';
 import {metric} from '@whenly/theme/theme';
@@ -184,19 +192,32 @@ const AddressMap = forwardRef((props: IAddressMap, ref) => {
             data={suggestions}
             renderItem={({item}) => {
               return (
-                <Button
+                // <Button
+                //   onPress={() => {
+                //     setVia('search');
+                //     setCoordinates(item.geometry.coordinates);
+                //     setSelectedAddress(item.place_name);
+                //     setSuggestions([]);
+                //   }}
+                //   variant={'outline'}
+                //   textAlign="left"
+                //   size="sm"
+                //   my={1}>
+                //   {item.place_name}
+                // </Button>
+
+                <Pressable
                   onPress={() => {
                     setVia('search');
                     setCoordinates(item.geometry.coordinates);
                     setSelectedAddress(item.place_name);
                     setSuggestions([]);
-                  }}
-                  variant={'outline'}
-                  textAlign="left"
-                  size="sm"
-                  my={1}>
-                  {item.place_name}
-                </Button>
+                  }}>
+                  <HStack py={2} px={2} alignItems="center">
+                    <Icon as={FontAwesome} name="location-arrow" mr={2} />
+                    <Text>{item.place_name}</Text>
+                  </HStack>
+                </Pressable>
               );
             }}
           />

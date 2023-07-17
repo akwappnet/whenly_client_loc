@@ -1,17 +1,12 @@
-import {Button, HStack, Text, VStack, Box} from 'native-base';
-import React, {useMemo} from 'react';
+import {VStack} from 'native-base';
+import React, {useEffect} from 'react';
 import {
   Plan,
-  planActions,
   selectProductState,
-  Subscription,
   useAppDispatch,
+  productActions,
 } from '@whenly/redux';
-import Collapse from '@whenly/components/Collapse';
-import {convertToCurrency} from '@whenly/utils/numbers';
-import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
-import {PLAN} from '@whenly/constants';
 import EmptyListMessage from '@whenly/components/EmptyListMessage';
 import MerchantPackageItem from './MerchantPackageItem';
 
@@ -20,20 +15,12 @@ interface PackagesProps {
 }
 
 export default function MerchantPackages({plans}: PackagesProps) {
-  const navigation = useNavigation();
   const appDispatch = useAppDispatch();
-  const {subscriptions} = useSelector(selectProductState);
+  useSelector(selectProductState);
 
-  console.log('PLANS', plans);
-
-  const tags = useMemo(() => {
-    const tagsArray: string[] = [];
-    plans.forEach((plan: Plan) => {
-      if (!tagsArray.includes(plan.tags)) tagsArray.push(plan.tags);
-    });
-
-    return tagsArray;
-  }, [plans]);
+  useEffect(() => {
+    appDispatch(productActions.subscriptions());
+  }, [appDispatch]);
 
   return (
     <VStack>
@@ -43,7 +30,9 @@ export default function MerchantPackages({plans}: PackagesProps) {
         })
       ) : (
         <EmptyListMessage
-          message={`This merchant doesn't have available plans yet. Check back soon!`}
+          message={
+            "This merchant doesn't have available plans yet. Check back soon!"
+          }
         />
       )}
     </VStack>

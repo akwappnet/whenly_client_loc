@@ -1,47 +1,23 @@
 import React from 'react';
-import {Alert} from 'react-native';
 import {
   Avatar,
-  Box,
   Button,
   Center,
   Heading,
   HStack,
-  IconButton,
   VStack,
 } from 'native-base';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import NavigationButton from '@whenly/components/dashboard/profile/NavigationButton';
-import InboxSection from '@whenly/components/profile/InboxSection';
 import HeaderBar from '@whenly/components/HeaderBar';
-import {useAppDispatch, authActions, selectAuthState} from '@whenly/redux';
-import {useNavigation} from '@react-navigation/native';
+import {useAppDispatch, selectAuthState} from '@whenly/redux';
 import {useSelector} from 'react-redux';
+import ActivityLog from '@whenly/components/profile/ActivityLog';
 
 const ProfileMain = (props: any) => {
   const {user} = useSelector(selectAuthState);
   const appDispatch = useAppDispatch();
   // const navigation = useNavigation()
-  const handleLogout = () => {
-    Alert.alert(
-      'Log out',
-      'You are about to log out. Do you want to proceed?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Log out',
-          style: 'destructive',
-          onPress: () => {
-            appDispatch(authActions.logout());
-          },
-        },
-      ],
-    );
-  };
 
   return (
     <SafeAreaView>
@@ -53,7 +29,7 @@ const ProfileMain = (props: any) => {
         //   </IconButton>
         // }
       />
-      <VStack space={2}>
+      <VStack space={2} mb={20}>
         <Center py={6}>
           <Avatar
             bg="gray.300"
@@ -88,12 +64,12 @@ const ProfileMain = (props: any) => {
               props.navigation.push('Passes');
             }}
           />
-          <NavigationButton
+          {/* <NavigationButton
             name="Activity"
             onPress={() => {
               props.navigation.push('Activity');
             }}
-          />
+          /> */}
           <NavigationButton
             name="Settings"
             onPress={() => {
@@ -101,8 +77,9 @@ const ProfileMain = (props: any) => {
             }}
           />
         </HStack>
-
-        <InboxSection />
+        {/* <InboxSection /> */}
+        {/* <ProfileActivities /> */}
+        <ActivityLog />
       </VStack>
     </SafeAreaView>
   );

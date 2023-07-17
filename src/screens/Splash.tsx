@@ -10,6 +10,7 @@ import {
 import {useAppDispatch, authActions, selectAuthState} from '@whenly/redux';
 import {useSelector} from 'react-redux';
 import {AUTH_STACK, MAIN_STACK, PHONE_VERIFICATION} from '@whenly/constants';
+import OneSignal from 'react-native-onesignal';
 
 const {width} = Dimensions.get('screen');
 
@@ -36,10 +37,15 @@ const Splash = () => {
   useEffect(() => {
     if (!loading) {
       if (user) {
-        //TODO uncomment following code before release the apk//
-        navigation.navigate(MAIN_STACK);
+        OneSignal.setExternalUserId(user.id);
+        // Pass in email provided by customer
+        OneSignal.setEmail(user.email);
+
+        // Pass in phone number provided by customer
+        OneSignal.setSMSNumber(user.phoneNumber);
+
         // if (user.isPhoneVerified) {
-        //   navigation.navigate(MAIN_STACK);
+        navigation.navigate(MAIN_STACK);
         // } else {
         //   navigation.navigate(PHONE_VERIFICATION);
         // }

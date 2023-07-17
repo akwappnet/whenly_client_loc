@@ -1,3 +1,4 @@
+import React from 'react';
 import {Box, Heading, VStack} from 'native-base';
 import {Dimensions, FlatList} from 'react-native';
 import DealsListItem from './DealsListItem';

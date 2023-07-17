@@ -1,6 +1,11 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import {PLAN, PRODUCT} from '@whenly/constants';
-import {getPlans, getPlan, subscribePlan} from '@whenly/services';
+import {
+  getPlans,
+  getPlan,
+  subscribePlan,
+  cancelSubscription,
+} from '@whenly/services';
 import {joinWithSlash} from '@whenly/utils/string';
 
 export interface Plan {
@@ -56,7 +61,6 @@ const plans = createAsyncThunk(
   async (merchantId: string, {rejectWithValue}) => {
     try {
       const response = await getPlans({createdBy: merchantId});
-
       return response?.data;
     } catch (error) {
       console.log('Error fetching plans', error);
@@ -79,14 +83,35 @@ const planDetails = createAsyncThunk(
   },
 );
 
+const cancelPlan = createAsyncThunk(
+  joinWithSlash(PRODUCT, 'cancelPlan'),
+  async (planId: string, {rejectWithValue}) => {
+    try {
+      const response = await cancelSubscription(planId);
+      return response?.data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
+
 const subscribeToPlan = createAsyncThunk(
   joinWithSlash(PLAN, 'subscribeToPlan'),
-  async (referenceNo: string, {rejectWithValue, getState}) => {
+  async (
+    payload: {referenceNo: string; txnId: string; status: string},
+    {rejectWithValue, getState},
+  ) => {
     try {
       const {plan} = getState();
+      const planid = plan.plan._id;
 
-      const response = await subscribePlan(plan.plan._id, referenceNo);
-
+      const {referenceNo, txnId} = payload;
+      console.log('subscribeToPlan', payload);
+      const response = await subscribePlan({
+        planId: plan.plan._id,
+        referenceNo,
+        transactionId: txnId,
+      });
       return response?.data;
     } catch (error) {
       return rejectWithValue(error);
@@ -139,6 +164,18 @@ const {actions, reducer} = createSlice({
       state.loadingPlan = false;
       state.error = payload.error;
     },
+    [cancelPlan.pending.type]: (state) => {
+      state.loadingPlan = true;
+      state.error = '';
+    },
+    [cancelPlan.fulfilled.type]: (state, {payload}) => {
+      state.loadingPlan = false;
+      state.error = '';
+    },
+    [cancelPlan.rejected.type]: (state, {payload}) => {
+      state.loadingPlan = false;
+      state.error = payload.error;
+    },
   },
 });
 
@@ -147,6 +184,7 @@ export const planActions = {
   plans,
   planDetails,
   subscribeToPlan,
+  cancelPlan,
 };
 
 export default reducer;
