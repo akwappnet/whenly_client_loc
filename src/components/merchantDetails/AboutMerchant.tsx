@@ -89,7 +89,7 @@ const AboutMerchant = ({user}: AboutMerchantProps) => {
         console.log('else');
       }
     } catch (error) {
-      console.log('@@@@@@@@@@@@error', error);
+      console.log('error', error);
     }
   };
   const renderReviewData = ({item}) => {
@@ -125,9 +125,62 @@ const AboutMerchant = ({user}: AboutMerchantProps) => {
       </View>
     );
   };
+
+  const onContactClick = ({social, value}: {social: string; value: string}) => {
+    try {
+      console.log('Click', social, value);
+      if (social === 'phone') {
+        Linking.openURL(`tel:${value}`);
+      } else if (social === 'email') {
+        Linking.openURL(`mailto:${value}`);
+      } else {
+        Linking.openURL(`${value}`);
+      }
+    } catch (error) {
+      console.log('error@onContactClick', error);
+    }
+  };
+
   return (
     <Box>
       <ScrollView showsHorizontalScrollIndicator={false} py="55px">
+        <Collapse
+          expanded={true}
+          header={
+            <Box>
+              <Text fontWeight="bold">Contact</Text>
+            </Box>
+          }
+          content={
+            <Box py={2}>
+              {Object.keys(contactDetails).map((social: string) =>
+                !!contactDetails[social] ? (
+                  <Box
+                    key={social}
+                    flexDirection="row"
+                    justifyContent="space-between"
+                    my={1}>
+                    <Text numberOfLines={1} {...contactLabelStyles} flex={1}>
+                      {capitalizeFirstLetter(social)}
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() =>
+                        onContactClick({
+                          social,
+                          value: String(contactDetails[social]),
+                        })
+                      }
+                      style={{flex: 3}}>
+                      <Text numberOfLines={1} {...contactStyles}>
+                        {contactDetails[social]}
+                      </Text>
+                    </TouchableOpacity>
+                  </Box>
+                ) : null,
+              )}
+            </Box>
+          }
+        />
         <Collapse
           header={
             <Box>

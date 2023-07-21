@@ -25,3 +25,13 @@ export const CATEGORIES = [
   'Facial',
   'Meditation',
 ];
+
+export const PAYMENT_OPTIONS = [
+  {label: 'Credit/Debit Card', logo: '', value: 'cc'},
+  {label: 'Online Banking', logo: '', value: 'online-banking'},
+  {
+    label: 'GCash',
+    logo: 'https://gw.dragonpay.ph/Bank/images/gcashlogo.jpg',
+    value: 'GCSB',
+  },
+];

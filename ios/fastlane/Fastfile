@@ -41,10 +41,10 @@ platform :ios do
       )
 
       # Changelog
-      changelog = prompt(
-        text: "What's new on this build? (type END to submit): ",
-        multi_line_end_keyword: "END"
-      )
+      # changelog = prompt(
+      #   text: "What's new on this build? (type END to submit): ",
+      #   multi_line_end_keyword: "END"
+      # )
 
       clear_derived_data
 
@@ -99,10 +99,11 @@ platform :ios do
         # include_bitcode: true,
       )
 
-      # Upload TestFlight
+      # Upload App Store
       deliver(
         force: true, # Skip HTMl report verification
-        itc_provider: '3934GD6Y3P'
+        itc_provider: '3934GD6Y3P',
+        skip_screenshots: true
       )
 
       # Clean

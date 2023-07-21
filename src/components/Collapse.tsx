@@ -5,10 +5,11 @@ import Feather from 'react-native-vector-icons/Feather';
 interface CollapseProps {
   header: ReactNode;
   content: ReactNode;
+  expanded?: boolean;
 }
 
 export default function Collapse(props: CollapseProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(props.expanded ?? false);
 
   return (
     <Box my={2}>

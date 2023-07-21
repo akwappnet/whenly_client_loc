@@ -68,7 +68,6 @@ const size = metric.fullWidth / 3 - 24;
 const CategoryList = () => {
   const navigation = useNavigation();
   const onPress = (category: string) => {
-    console.log('TEST', category);
     navigation.navigate('SearchResults', {category: category.value});
   };
 

@@ -37,7 +37,6 @@ const MerchantClassItem = ({classData, showMerchant}: ClassItemProps) => {
   const duration = moment.duration(start.diff(end));
   const subscription = SubscriptionTag(classData.tags.toLowerCase());
   const viaSubscription = subscription?.sessions > 0;
-  console.log('@@@@viaSub', viaSubscription);
   return (
     <HStack alignItems="center" space={2} py={2}>
       <Box flex={3}>

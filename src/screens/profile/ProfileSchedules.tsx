@@ -125,7 +125,6 @@ const ProfileSchedules = (props: any) => {
   //     clearInterval(interval);
   //   };
   // }, []);
-  // // console.log('schedules', schedules, '@@@@@@@question', questions);
   useEffect(() => {
     const timer = setTimeout(() => console.log('Initial timeout!'), 1000);
   }, []);
@@ -134,8 +133,6 @@ const ProfileSchedules = (props: any) => {
     const response = await appDispatch(productActions.bookings());
     if (!isEmptyArray(response.payload.docs)) {
       setScheduleData(response.payload.docs);
-    } else {
-      console.log('@@@@error');
     }
   };
 
@@ -171,15 +168,18 @@ const ProfileSchedules = (props: any) => {
   };
 
   const ratingCompleted = (rating) => {
+    console.log('Rating is: ' + rating);
     setRating(rating);
     const reviews = ['Poor', 'Poor', 'Good', 'Good', 'Excellent'];
     const selectedReview = reviews[rating - 1];
     setSelectedValue(selectedReview);
+    console.log('Selected review:', selectedReview);
   };
 
   const ratingCompletedendTime = (rating) => {
     const reviews = ['Difficult', 'Difficult', 'Okay', 'Okay', 'Easy'];
     const selectedReview = reviews[rating - 1];
+    console.log('Selected review:second', selectedReview);
     setSelectedEndTimeValue(selectedReview);
   };
 
@@ -238,6 +238,7 @@ const ProfileSchedules = (props: any) => {
       );
       setModalVisible(!modalVisible);
       selectedItem = null;
+      // console.log('@@@@@responseSubmitData', JSON.stringify(response));
     } catch (error) {
       console.log('Error', error);
     }
@@ -271,6 +272,8 @@ const ProfileSchedules = (props: any) => {
 
   const renderScheduleItem = ({item}: any) => {
     const isOpen = expandedSched === item.id;
+    // const {name, createdAt, startsAt} = item;
+    // console.log(item);
     return (
       <View>
         <View flexDirection={'row'} style={{marginVertical: hp('2%')}}>

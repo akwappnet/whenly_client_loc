@@ -80,9 +80,11 @@ const ProfilePasses = (props: any) => {
     );
   };
 
+  console.log('subscriptions',subscriptions)
+
   function renderScheduleItem({item}: any) {
     const isOpen = expandedSched === item.id;
-    const {name, description, createdAt, duration} = item.productDetails;
+    const {name, description, duration} = item.productDetails;
     return (
       <Box py={6}>
         <Box flexDirection={'row'}>
@@ -115,7 +117,7 @@ const ProfilePasses = (props: any) => {
               }`}
             </Text>
             <Text px={2} flex={2} numberOfLines={2} fontSize={12}>
-              {`Order Date: ${moment.utc(createdAt).format('LL')}`}
+              {`Order Date: ${moment(item.createdAt).format('LL')}`}
             </Text>
           </VStack>
           <Box flex={1}>

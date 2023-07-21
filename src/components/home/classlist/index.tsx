@@ -33,10 +33,8 @@ const ClassList = () => {
 
   const currentUser = useSelector(selectCurrentUser);
   const {loading, docs} = useSelector(selectMerchantState);
-  console.log('@@@@curentUSer', currentUser);
   useFocusEffect(
     useCallback(() => {
-      console.log('Fetch Nearby');
       let filters = {};
       if (currentUser?.address?.length > 0) {
         filters.coordinates = [

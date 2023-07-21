@@ -34,9 +34,10 @@ export default function MerchantPackageItem({
   const {subscriptions} = useSelector(selectProductState);
   const [expanded, setExpanded] = useState(false);
 
-  const subscribed = subscriptions.some(
-    (sub: Subscription) => sub.planId === planData._id,
-  );
+  // Check active subscriptions
+  const subscribed = subscriptions
+    .filter((s) => s.status === 'active')
+    .some((sub: Subscription) => sub.planId === planData._id);
 
   const descriptionLines = expanded ? {} : {numberOfLines: 1};
 

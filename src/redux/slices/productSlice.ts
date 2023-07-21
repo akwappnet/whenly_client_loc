@@ -4,13 +4,14 @@ import {
   getBookings,
   getInvoice,
   getLatestBookingReview,
-  getPlans,
+  getPlans,  
   getReviewDataDetail,
   getReviewQuestion,
   getSubscriptions,
   requestPayment,
   RequestPaymentPayload,
   reviewSubmit,
+  createXenditInvoice as createXenditInvoiceAPI,
 } from '@whenly/services';
 import {joinWithSlash} from '@whenly/utils/string';
 
@@ -114,15 +115,29 @@ const initialState: ProductState = {
   submitReviewget: [],
 };
 
+const createXenditInvoice = createAsyncThunk(
+  joinWithSlash(PRODUCT, 'xendit-invoice'),
+  async (payload: any, {rejectWithValue}) => {
+    try {
+      const response = await createXenditInvoiceAPI(payload);
+      // console.log('createXenditInvoice', response);
+      return response.data;
+    } catch (error) {
+      console.log('error@createXenditInvoice', error);
+      return rejectWithValue(error?.message || error);
+    }
+  },
+);
+
 const getDragonPayToken = createAsyncThunk(
   joinWithSlash(PRODUCT, 'dragonpay-token'),
   async (payload: RequestPaymentPayload, {rejectWithValue}) => {
     try {
       const response = await requestPayment(payload);
-      console.log('get dragonpay token', response);
+      // console.log('getDragonPayToken', response);
       return response.data;
     } catch (error) {
-      console.log('get dragonpay token error', error?.response);
+      console.log('error@getDragonPayToken', error?.response);
       return rejectWithValue(error?.message || error);
     }
   },
@@ -149,7 +164,7 @@ const subscriptions = createAsyncThunk(
 
       return response?.data;
     } catch (error) {
-      return rejectWithValue(error.message || error);
+      return rejectWithValue(error?.message || error);
     }
   },
 );
@@ -158,10 +173,60 @@ const bookings = createAsyncThunk(
   async (_, {rejectWithValue}) => {
     try {
       const response = await getBookings();
-
       return response?.data;
     } catch (error) {
-      return rejectWithValue(error.message || error);
+      return rejectWithValue(error?.message || error);
+    }
+  },
+);
+
+const reviewQuestions = createAsyncThunk(
+  joinWithSlash(CLIENT, 'reviewQuestion'),
+  async (_, {rejectWithValue}) => {
+    try {
+      const response = await getReviewQuestion();
+      console.log('reviewQuestion', response);
+      return response?.data;
+    } catch (error) {
+      return rejectWithValue(error?.message || error);
+    }
+  },
+);
+
+const getReviewData = createAsyncThunk(
+  joinWithSlash(CLIENT, 'getReviewData'),
+  async (params) => {
+    try {
+      const response = await getReviewDataDetail(params);
+      return response?.data;
+    } catch (error) {
+      console.log('Error', error);
+    }
+  },
+);
+
+const latestBookingReview = createAsyncThunk(
+  joinWithSlash(CLIENT, 'latestBookingReview'),
+  async (_, {rejectWithValue}) => {
+    try {
+      const response = await getLatestBookingReview();
+      console.log('lastestBooking', JSON.stringify(response));
+      return response?.data;
+    } catch (error) {
+      return rejectWithValue(error?.message || error);
+    }
+  },
+);
+
+const submitReviewQuestions = createAsyncThunk(
+  joinWithSlash(CLIENT, 'submitReviewQuestion'),
+  async (payload, {rejectWithValue}) => {
+    try {
+      const response = await reviewSubmit(payload);
+      console.log('reviewQuestionData', JSON.stringify(response));
+    } catch (error: any) {
+      console.log('Error', error);
+      return rejectWithValue('Something went wrong. Please try again');
     }
   },
 );
@@ -228,6 +293,18 @@ const {actions, reducer} = createSlice({
       state.error = payload;
     },
     [getDragonPayToken.fulfilled.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = '';
+    },
+    [createXenditInvoice.pending.type]: (state, {payload}) => {
+      state.loading = true;
+      state.error = '';
+    },
+    [createXenditInvoice.rejected.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = payload;
+    },
+    [createXenditInvoice.fulfilled.type]: (state, {payload}) => {
       state.loading = false;
       state.error = '';
     },
@@ -298,7 +375,6 @@ const {actions, reducer} = createSlice({
 
 export const productActions = {
   ...actions,
-  getDragonPayToken,
   invoice,
   subscriptions,
   bookings,
@@ -306,6 +382,8 @@ export const productActions = {
   submitReviewQuestions,
   getReviewData,
   latestBookingReview,
+  getDragonPayToken,
+  createXenditInvoice,
 };
 
 export default reducer;

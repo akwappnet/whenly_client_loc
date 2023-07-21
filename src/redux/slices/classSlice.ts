@@ -122,9 +122,10 @@ const book = createAsyncThunk(
         classId: classState.class._id,
         referenceNo,
         transactionId: txnId,
-        // status,
-        // subscription,
+        status,
+        subscription,
       });
+      console.log('book', response);
       return response?.data;
     } catch (error) {
       return rejectWithValue(error?.message || error);

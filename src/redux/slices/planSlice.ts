@@ -104,18 +104,9 @@ const subscribeToPlan = createAsyncThunk(
     try {
       const {plan} = getState();
       const planid = plan.plan._id;
-      console.log(
-        '@@@@@payloadDataSub',
-        payload.referenceNo,
-        'transId',
-        payload.txnId,
-        'status',
-        payload.status,
-        'planId',
-        planid,
-      );
-      const {referenceNo, txnId} = payload;
 
+      const {referenceNo, txnId} = payload;
+      console.log('subscribeToPlan', payload);
       const response = await subscribePlan({
         planId: plan.plan._id,
         referenceNo,

@@ -54,8 +54,10 @@ const Login = () => {
         // w={'200px'}
         resizeMode="contain"
       />
-      <Heading mt={'50px'}>Welcome</Heading>
-      <Text>Login to your account</Text>
+      <Heading size="xl" mt={'50px'}>
+        Welcome
+      </Heading>
+      <Text fontSize={'md'}>Login to your account</Text>
       {/* {error && <Alert status="error">{error}</Alert>} */}
       <Formik
         initialValues={{
@@ -86,7 +88,7 @@ const Login = () => {
           <Stack space={4} mt="8">
             <FormControl
               isInvalid={errors.email && touched.email ? true : false}>
-              <FormControl.Label _text={{fontSize: 'xs'}}>
+              <FormControl.Label _text={{fontSize: 'sm'}}>
                 EMAIL ADDRESS
               </FormControl.Label>
               <Input
@@ -95,6 +97,7 @@ const Login = () => {
                 autoCapitalize="none"
                 autoCorrect={false}
                 keyboardType="email-address"
+                fontSize={'md'}
                 onChangeText={handleChange('email')}
                 onBlur={handleBlur('email')}
                 value={values.email}
@@ -105,7 +108,7 @@ const Login = () => {
             </FormControl>
             <FormControl
               isInvalid={errors.password && touched.password ? true : false}>
-              <FormControl.Label _text={{fontSize: 'xs'}}>
+              <FormControl.Label _text={{fontSize: 'sm'}}>
                 PASSWORD
               </FormControl.Label>
               <Input
@@ -113,6 +116,7 @@ const Login = () => {
                 placeholder=""
                 autoCapitalize="none"
                 secureTextEntry
+                fontSize={'md'}
                 autoCorrect={false}
                 onChangeText={handleChange('password')}
                 onBlur={handleBlur('password')}
@@ -125,6 +129,7 @@ const Login = () => {
             <Button
               variant={'ghost'}
               size={'md'}
+              _text={{fontSize: 'md'}}
               onPress={() => {
                 navigation.navigate(FORGOT_PASSWORD);
               }}>
@@ -135,12 +140,14 @@ const Login = () => {
               isLoading={loading}
               isDisabled={!isValid}
               onPress={handleSubmit}
+              _text={{fontSize: 'md'}}
               borderRadius={metric.buttonRadius}>
               LOGIN
             </Button>
             <Button
               variant={'ghost'}
               mt={'8'}
+              _text={{fontSize: 'md'}}
               onPress={() => {
                 navigation.navigate(REGISTER);
               }}

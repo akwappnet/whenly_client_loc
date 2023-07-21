@@ -50,7 +50,6 @@ const dummyPhoto =
 
 const MerchantDetailsScreen = (props) => {
   const {navigation, route} = props;
-  console.log('Route', route);
   const {from, type} = route?.params || {};
   const insets = useSafeAreaInsets();
   const appDispatch = useAppDispatch();
@@ -120,11 +119,9 @@ const MerchantDetailsScreen = (props) => {
         }),
       );
     } catch (err) {
-      console.log('Err', err);
+      console.log('error@toggleFavorite', err);
     }
   };
-
-  console.log('isFavorite', isFavorite);
 
   return (
     <View>
