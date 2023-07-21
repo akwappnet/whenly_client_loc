@@ -108,7 +108,7 @@ const UserLocation = (props) => {
       const response = await axios.get(endpoint, {
         params: {
           access_token: MAP_BOX_TOKEN,
-          country: 'PH',
+          country: 'IN',
           types: 'locality',
           autocomplete: true,
         },

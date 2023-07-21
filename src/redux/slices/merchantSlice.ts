@@ -72,10 +72,10 @@ const initialState: MerchantState = {
 
 const merchants = createAsyncThunk(
   joinWithSlash(MERCHANT, 'merchants'),
-  async (_, {rejectWithValue}) => {
+  async (payload: any, {rejectWithValue}) => {
     try {
-      const response = await getMerchants();
-
+      console.log('merchants payload', payload);
+      const response = await getMerchants(payload);
       console.log('FETCHING MERCHANTS', response);
       return response?.data;
     } catch (error) {
@@ -90,7 +90,7 @@ const merchant = createAsyncThunk(
     try {
       const response = await getMerchant(merchantId);
 
-      console.log('FETCHING Merchant', response);
+      console.log('FETCHING Merchant', JSON.stringify(response));
       return response?.data;
     } catch (error) {
       console.log('Error fetching merchants', error);

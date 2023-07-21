@@ -1,3 +1,4 @@
+import React from 'react';
 import {AspectRatio, Box, Text} from 'native-base';
 
 const DealsListItem = ({item}: {item: string}) => {

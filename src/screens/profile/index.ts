@@ -4,6 +4,7 @@ import ProfilePasses from './ProfilePasses';
 import ProfileActivities from './ProfileActivities';
 import EditProfile from './EditProfile';
 import Settings from './Settings';
+import ViewMapFullScreen from './ViewMapFullScreen';
 
 export {
   ProfileMain,
@@ -12,4 +13,5 @@ export {
   ProfileActivities,
   EditProfile,
   Settings,
+  ViewMapFullScreen,
 };

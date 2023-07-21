@@ -1,6 +1,15 @@
 import React from 'react';
 import {Dimensions, ImageSourcePropType} from 'react-native';
-import {AspectRatio, Box, Center, Image, Pressable, Text} from 'native-base';
+import {
+  AspectRatio,
+  Box,
+  Center,
+  Image,
+  Pressable,
+  Text,
+  VStack,
+  HStack,
+} from 'native-base';
 
 const {width} = Dimensions.get('screen');
 
@@ -8,27 +17,33 @@ interface ClassItemProps {
   onPress: () => void;
   title: string;
   subTitle: string;
+  distance?: number;
   imageURL: ImageSourcePropType | undefined;
 }
 
-const ClassItem = ({onPress, title, subTitle, imageURL}: ClassItemProps) => {
+const ClassItem = ({
+  onPress,
+  title,
+  subTitle,
+  imageURL,
+  distance,
+}: ClassItemProps) => {
   return (
     <Pressable onPress={onPress}>
       {({isPressed}) => (
         <Box
           opacity={isPressed ? 0.6 : 1}
           width={{
-            base: width * 0.72,
-            lg: 250,
-          }}
-          mr={2}>
+            base: width * 0.75,
+            // lg: 250,
+          }}>
           <Box
             width="100%"
-            borderRadius="2xl"
+            borderRadius="xl"
             height={130}
             backgroundColor="gray.300">
             <Image
-              borderRadius="2xl"
+              borderRadius="xl"
               resizeMode="cover"
               source={imageURL}
               height={'100%'}
@@ -36,7 +51,14 @@ const ClassItem = ({onPress, title, subTitle, imageURL}: ClassItemProps) => {
               alt={title || 'Appointment'}
             />
           </Box>
-          <Text fontWeight="bold">{title}</Text>
+          <HStack alignItems={'center'} justifyContent={'space-between'}>
+            <Text fontWeight="bold">{title}</Text>
+            {distance && (
+              <Text color="gray.500" fontSize="xs">
+                {`~${distance} km`}
+              </Text>
+            )}
+          </HStack>
           <Text color="gray.500" fontSize="xs">
             {subTitle}
           </Text>

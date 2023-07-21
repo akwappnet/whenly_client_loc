@@ -57,6 +57,12 @@ const login = createAsyncThunk(
       const response = await postLogin(payload.email, payload.password);
       console.log('loginSliceResponse', response);
       successToast('Success', 'Login successful');
+      if (response?.data?.user?.role !== 'client') {
+        await postLogout();
+        await GoogleSignin.signOut();
+        errorToast('Authentication Failed', 'User access denied');
+        return rejectWithValue('User access denied');
+      }
       return response?.data?.user;
     } catch (error) {
       console.log('Error', error);
@@ -302,9 +308,7 @@ const getActivityListApi = createAsyncThunk(
   joinWithSlash(AUTH, 'getActivityListApi'),
   async (page) => {
     try {
-      console.log('page===action===>', page);
       const response = await getActivityList(page);
-      console.log('getActivities', JSON.stringify(response));
       return response?.data;
     } catch (error) {
       console.log('Error', error);

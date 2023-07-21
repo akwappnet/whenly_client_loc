@@ -9,3 +9,41 @@ export const selectPlans = createSelector(
   selectPlanState,
   (plans) => plans.docs,
 );
+
+export const selectBookings = createSelector(
+  selectProductState,
+  (product) => product.bookings,
+);
+
+export const selectQuestion = createSelector(
+  selectProductState,
+  (product) => product.question,
+);
+
+export const submitReviewget = createSelector(
+  selectProductState,
+  (product) => product.submitReviewget,
+);
+
+export const selectLatestReviewBooking = createSelector(
+  selectProductState,
+  (product) => product.latestBookingReview,
+);
+
+export const selectSubscriptions = createSelector(
+  selectProductState,
+  (product) => product.subscriptions,
+);
+
+export const selectSubscriptionTags = createSelector(
+  selectSubscriptions,
+  (subs) =>
+    subs.map((sub) => ({
+      id: sub.id,
+      // tags: sub.tags,
+      tags: sub.tags.toLowerCase().split(','),
+      sessions: sub.sessions,
+      status: sub.status,
+      count: 0,
+    })),
+);

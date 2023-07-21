@@ -1,4 +1,3 @@
-import ProfileContainer from '@whenly/components/profile/ProfileContainer';
 import Card from '@whenly/components/Card';
 import EmptyListMessage from '@whenly/components/EmptyListMessage';
 import {Box, Divider, FlatList} from 'native-base';
@@ -10,33 +9,6 @@ import {ActivityIndicator, Dimensions, ScrollView} from 'react-native';
 import colors from 'native-base/lib/typescript/theme/base/colors';
 import {isEmptyArray} from 'formik';
 const {height} = Dimensions.get('screen');
-
-const dummyActivities = [
-  {
-    id: 1,
-    description:
-      'Missed: Taekwondo at X on Oct 27, 2022 at 9:00 am with Coach N',
-    date: new Date(),
-  },
-  {
-    id: 2,
-    description:
-      'Missed: Taekwondo at X on Oct 27, 2022 at 9:00 am with Coach N',
-    date: new Date(),
-  },
-  {
-    id: 3,
-    description:
-      'Missed: Taekwondo at X on Oct 27, 2022 at 9:00 am with Coach N',
-    date: new Date(),
-  },
-  {
-    id: 4,
-    description:
-      'Missed: Taekwondo at X on Oct 27, 2022 at 9:00 am with Coach N',
-    date: new Date(),
-  },
-];
 
 const ProfileActivities = () => {
   const [activities, setActivities] = useState([]);
@@ -63,12 +35,9 @@ const ProfileActivities = () => {
   };
 
   const loadMoreData = async () => {
-    // setPaginationres(...response.payload.data);
-    // let pageCount = page + 1;
-    // console.log('pageCount', pageCount);
-
     if (paginationres.nextPage !== null) {
       setLoadMoreLoading(true);
+
       const response = await appDispatch(
         authActions.getActivityListApi(page + 1),
       );
@@ -105,25 +74,19 @@ const ProfileActivities = () => {
     );
   };
   return (
-    <ProfileContainer
-      title="My Activities"
-      subtitle="You can find all the records of your activities here.">
-      <Card>
-        <FlatList
-          data={activities}
-          renderItem={renderActivityItem}
-          keyExtractor={(item, index) => index.toString()}
-          ListEmptyComponent={
-            <EmptyListMessage message="Nothing to see here!" />
-          }
-          height={height * 0.55}
-          // onEndReachedThreshold={0.2}
-          onEndReached={loadMoreData}
-          ListFooterComponent={listFooterComponent}
-          ItemSeparatorComponent={() => <Divider />}
-        />
-      </Card>
-    </ProfileContainer>
+    <Card>
+      <FlatList
+        data={activities}
+        renderItem={renderActivityItem}
+        keyExtractor={(item, index) => index.toString()}
+        ListEmptyComponent={<EmptyListMessage message="Nothing to see here!" />}
+        height={height * 0.55}
+        // onEndReachedThreshold={0.2}
+        onEndReached={loadMoreData}
+        ListFooterComponent={listFooterComponent}
+        ItemSeparatorComponent={() => <Divider />}
+      />
+    </Card>
   );
 };
 export default ProfileActivities;

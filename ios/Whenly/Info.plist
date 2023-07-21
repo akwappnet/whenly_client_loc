@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>1.3.2</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -38,13 +38,15 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>5</string>
+	<string>41</string>
 	<key>FacebookAppID</key>
 	<string>845615043514448</string>
 	<key>FacebookClientToken</key>
 	<string>a1d479a1e82dc5ae381cf7427a4fac25</string>
 	<key>FacebookDisplayName</key>
 	<string>Whenly</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>fbapi</string>
@@ -63,16 +65,16 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>This lets you do things like change profile image and set merchant gallery</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>The location access is used within the app for search purposes, specifically to show services that are geographically close to the user. By requesting and accessing the user's location, the app can provide personalized and relevant search results, displaying wellness services that are available nearby. This enhances the user experience by helping them find and book services conveniently based on their location.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>The location access is used within the app for search purposes, specifically to show services that are geographically close to the user. By requesting and accessing the user's location, the app can provide personalized and relevant search results, displaying wellness services that are available nearby. This enhances the user experience by helping them find and book services conveniently based on their location.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-		<string>Your current location will be displayed on the map and used for nearby search results</string>
-		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-		<string>Your current location will be displayed on the map and used for nearby search results</string>
-		<key>NSLocationAlwaysUsageDescription</key>
-		<string>Your current location will be displayed on the map and used for nearby search results</string>
-		<key>NSPhotoLibraryUsageDescription</key>
-		<string>This lets you do things like change profile image and set merchant gallery</string>
-		<key>NSCameraUsageDescription</key>
-		<string>This lets you do things like change profile image and set merchant gallery</string>
+	<string>The location access is used within the app for search purposes, specifically to show services that are geographically close to the user. By requesting and accessing the user's location, the app can provide personalized and relevant search results, displaying wellness services that are available nearby. This enhances the user experience by helping them find and book services conveniently based on their location.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This lets you do things like change profile image and set merchant gallery</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
@@ -91,6 +93,10 @@
 		<string>Octicons.ttf</string>
 		<string>Zocial.ttf</string>
 		<string>Fontisto.ttf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

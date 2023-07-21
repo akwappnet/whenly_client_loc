@@ -3,10 +3,14 @@ import {CLIENT, PRODUCT} from '@whenly/constants';
 import {
   getBookings,
   getInvoice,
-  getPlans,
+  getLatestBookingReview,
+  getReviewDataDetail,
+  getReviewQuestion,
   getSubscriptions,
   requestPayment,
   RequestPaymentPayload,
+  reviewSubmit,
+  createXenditInvoice as createXenditInvoiceAPI,
 } from '@whenly/services';
 import {joinWithSlash} from '@whenly/utils/string';
 
@@ -79,6 +83,8 @@ export interface Subscription {
   createdBy: string;
   createdAt: string;
   updatedAt: string;
+  sessions: number;
+  tags: string;
   id: string;
 }
 
@@ -90,6 +96,9 @@ export type ProductState = {
   invoices: Invoice[];
   subscriptions: Subscription[];
   bookings: Subscription[];
+  question: Subscription[];
+  latestBookingReview: Subscription[];
+  submitReviewget: Subscription[];
 };
 
 const initialState: ProductState = {
@@ -100,19 +109,34 @@ const initialState: ProductState = {
   invoices: [],
   subscriptions: [],
   bookings: [],
+  question: [],
+  latestBookingReview: [],
+  submitReviewget: [],
 };
 
-const getDragonpayToken = createAsyncThunk(
+const createXenditInvoice = createAsyncThunk(
+  joinWithSlash(PRODUCT, 'xendit-invoice'),
+  async (payload: any, {rejectWithValue}) => {
+    try {
+      const response = await createXenditInvoiceAPI(payload);
+      // console.log('createXenditInvoice', response);
+      return response.data;
+    } catch (error) {
+      console.log('error@createXenditInvoice', error);
+      return rejectWithValue(error?.message || error);
+    }
+  },
+);
+
+const getDragonPayToken = createAsyncThunk(
   joinWithSlash(PRODUCT, 'dragonpay-token'),
   async (payload: RequestPaymentPayload, {rejectWithValue}) => {
     try {
       const response = await requestPayment(payload);
-
-      console.log('get dragonpay token', response);
+      // console.log('getDragonPayToken', response);
       return response.data;
     } catch (error) {
-      console.log('get dragonpay token error', error);
-
+      console.log('error@getDragonPayToken', error?.response);
       return rejectWithValue(error?.message || error);
     }
   },
@@ -139,7 +163,7 @@ const subscriptions = createAsyncThunk(
 
       return response?.data;
     } catch (error) {
-      return rejectWithValue(error.message || error);
+      return rejectWithValue(error?.message || error);
     }
   },
 );
@@ -148,11 +172,60 @@ const bookings = createAsyncThunk(
   async (_, {rejectWithValue}) => {
     try {
       const response = await getBookings();
-
-      console.log('BOOKINGS', response);
       return response?.data;
     } catch (error) {
-      return rejectWithValue(error.message || error);
+      return rejectWithValue(error?.message || error);
+    }
+  },
+);
+
+const reviewQuestions = createAsyncThunk(
+  joinWithSlash(CLIENT, 'reviewQuestion'),
+  async (_, {rejectWithValue}) => {
+    try {
+      const response = await getReviewQuestion();
+      console.log('reviewQuestion', response);
+      return response?.data;
+    } catch (error) {
+      return rejectWithValue(error?.message || error);
+    }
+  },
+);
+
+const getReviewData = createAsyncThunk(
+  joinWithSlash(CLIENT, 'getReviewData'),
+  async (params) => {
+    try {
+      const response = await getReviewDataDetail(params);
+      return response?.data;
+    } catch (error) {
+      console.log('Error', error);
+    }
+  },
+);
+
+const latestBookingReview = createAsyncThunk(
+  joinWithSlash(CLIENT, 'latestBookingReview'),
+  async (_, {rejectWithValue}) => {
+    try {
+      const response = await getLatestBookingReview();
+      console.log('lastestBooking', JSON.stringify(response));
+      return response?.data;
+    } catch (error) {
+      return rejectWithValue(error?.message || error);
+    }
+  },
+);
+
+const submitReviewQuestions = createAsyncThunk(
+  joinWithSlash(CLIENT, 'submitReviewQuestion'),
+  async (payload, {rejectWithValue}) => {
+    try {
+      const response = await reviewSubmit(payload);
+      console.log('reviewQuestionData', JSON.stringify(response));
+    } catch (error: any) {
+      console.log('Error', error);
+      return rejectWithValue('Something went wrong. Please try again');
     }
   },
 );
@@ -162,15 +235,27 @@ const {actions, reducer} = createSlice({
   initialState,
   reducers: {},
   extraReducers: {
-    [getDragonpayToken.pending.type]: (state, {payload}) => {
+    [getDragonPayToken.pending.type]: (state, {payload}) => {
       state.loading = true;
       state.error = '';
     },
-    [getDragonpayToken.rejected.type]: (state, {payload}) => {
+    [getDragonPayToken.rejected.type]: (state, {payload}) => {
       state.loading = false;
       state.error = payload;
     },
-    [getDragonpayToken.fulfilled.type]: (state, {payload}) => {
+    [getDragonPayToken.fulfilled.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = '';
+    },
+    [createXenditInvoice.pending.type]: (state, {payload}) => {
+      state.loading = true;
+      state.error = '';
+    },
+    [createXenditInvoice.rejected.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = payload;
+    },
+    [createXenditInvoice.fulfilled.type]: (state, {payload}) => {
       state.loading = false;
       state.error = '';
     },
@@ -201,15 +286,55 @@ const {actions, reducer} = createSlice({
       state.error = '';
       state.bookings = payload.docs;
     },
+    [reviewQuestions.pending.type]: (state, {payload}) => {
+      state.loading = true;
+      state.error = '';
+    },
+    [reviewQuestions.fulfilled.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = '';
+      state.question = payload.data.docs;
+    },
+    [submitReviewQuestions.pending.type]: (state, {payload}) => {
+      state.loading = true;
+      state.error = '';
+    },
+    [submitReviewQuestions.fulfilled.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = '';
+      // state.question = payload.data.docs;
+    },
+    [getReviewData.pending.type]: (state, {payload}) => {
+      state.loading = true;
+      state.error = '';
+    },
+    [getReviewData.fulfilled.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = '';
+    },
+    [latestBookingReview.pending.type]: (state, {payload}) => {
+      state.loading = true;
+      state.error = '';
+    },
+    [latestBookingReview.fulfilled.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = '';
+      state.latestBookingReview = payload;
+    },
   },
 });
 
 export const productActions = {
   ...actions,
-  getDragonpayToken,
   invoice,
   subscriptions,
   bookings,
+  reviewQuestions,
+  submitReviewQuestions,
+  getReviewData,
+  latestBookingReview,
+  getDragonPayToken,
+  createXenditInvoice,
 };
 
 export default reducer;

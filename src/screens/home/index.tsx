@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Dimensions, StyleSheet} from 'react-native';
+import {Dimensions, StyleSheet, TouchableWithoutFeedback} from 'react-native';
 import {
   AspectRatio,
   Box,
@@ -10,6 +10,7 @@ import {
   HStack,
   Icon,
   Input,
+  Pressable,
   ScrollView,
   Text,
   VStack,
@@ -51,15 +52,18 @@ const Home = (props) => {
 
   return (
     <Flex flex={1} safeAreaTop>
-      <ScrollView>
+      <ScrollView flex={1}>
         <VStack space={4} mb={'60px'}>
-          <Box px="20px" py="8px">
-            <SearchBar
-              value=""
-              onChangeText={(text: string) => {}}
-              placeholder="Search for classes..."
-            />
-          </Box>
+          <Pressable onPress={() => props.navigation.push('SearchResults')}>
+            <Box pointerEvents="none" px="20px" py="8px">
+              <SearchBar
+                value=""
+                editable={false}
+                // onChangeText={(text: string) => {}}
+                placeholder="Search..."
+              />
+            </Box>
+          </Pressable>
           <Featured />
           <ClassList />
           <CategoryList />

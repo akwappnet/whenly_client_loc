@@ -1,6 +1,6 @@
 import React from 'react';
 import HeaderBar from '@whenly/components/HeaderBar';
-import {Center, FlatList, Flex, Text} from 'native-base';
+import {Center, FlatList, Flex, Text, Box} from 'native-base';
 import {useSelector} from 'react-redux';
 import {merchantActions, selectFavorites, useAppDispatch} from '@whenly/redux';
 import MerchantCard from '@whenly/components/MerchantCard';
@@ -16,7 +16,9 @@ const Favorites = () => {
     <Flex flex={1} safeAreaTop>
       <HeaderBar title="Favorites" />
       <FlatList
+        p={4}
         data={favorites}
+        ItemSeparatorComponent={() => <Box h={8} />}
         renderItem={({item}: {item: User}) => {
           return (
             <MerchantCard

@@ -1,5 +1,5 @@
+import React, {ReactNode} from 'react';
 import {Box, Flex, Heading, IconButton, VStack} from 'native-base';
-import {ReactNode} from 'react';
 import Feather from 'react-native-vector-icons/Feather';
 
 interface HeaderBarProps {
@@ -16,6 +16,7 @@ const HeaderBar = ({onBack, headerRight, title, white}: HeaderBarProps) => {
         {onBack && (
           <IconButton
             onPress={() => onBack()}
+            borderRadius={'full'}
             icon={
               <Feather
                 name="chevron-left"
@@ -25,8 +26,6 @@ const HeaderBar = ({onBack, headerRight, title, white}: HeaderBarProps) => {
             }
           />
         )}
-
-        <Box flex={1}></Box>
         {headerRight}
       </Flex>
       {title && <Heading>{title}</Heading>}

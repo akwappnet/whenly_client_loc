@@ -1,5 +1,5 @@
 import {StyleSheet, Platform, ActivityIndicator} from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {
   Flex,
   Heading,
@@ -14,6 +14,9 @@ import {
   Divider,
   KeyboardAvoidingView,
   ScrollView,
+  Checkbox,
+  Pressable,
+  VStack,
   View,
 } from 'native-base';
 import {metric} from '../../theme/theme';
@@ -25,7 +28,12 @@ import {useSelector} from 'react-redux';
 import {authActions, selectAuthState, useAppDispatch} from '@whenly/redux';
 
 import SocialLogin from '@whenly/components/SocialLogin';
-import {LOGIN, MAIN_STACK, PHONE_VERIFICATION} from '@whenly/constants';
+import {
+  LOGIN,
+  MAIN_STACK,
+  PHONE_VERIFICATION,
+  WEB_EMBED,
+} from '@whenly/constants';
 
 const RegisterSchema = Yup.object().shape({
   firstName: Yup.string().required('Required Field'),
@@ -44,6 +52,7 @@ const RegisterSchema = Yup.object().shape({
 const Register = () => {
   const navigation = useNavigation();
   const appDispatch = useAppDispatch();
+  const [checked, setChecked] = useState(false);
   const {error, loading} = useSelector(selectAuthState);
 
   return (
@@ -190,6 +199,39 @@ const Register = () => {
                     {errors.password}
                   </FormControl.ErrorMessage>
                 </FormControl>
+                <VStack space={2} mt={8}>
+                  <Text color={'gray.400'}>
+                    By checking this box you consent to our
+                  </Text>
+                  <HStack space={2}>
+                    <Checkbox
+                      value="terms-privacy"
+                      isChecked={checked}
+                      onChange={setChecked}
+                    />
+                    <HStack space={2}>
+                      <Pressable
+                        onPress={() =>
+                          navigation.navigate(WEB_EMBED, {
+                            url: 'https://whenly.ph/terms-of-use?via=app',
+                            // title: 'Terms of Use',
+                          })
+                        }>
+                        <Text bold>Terms of Use</Text>
+                      </Pressable>
+                      <Text>and</Text>
+                      <Pressable
+                        onPress={() =>
+                          navigation.navigate(WEB_EMBED, {
+                            url: 'https://whenly.ph/privacy-policy?via=app',
+                            // title: 'Privacy Policy',
+                          })
+                        }>
+                        <Text bold>Privacy Policy</Text>
+                      </Pressable>
+                    </HStack>
+                  </HStack>
+                </VStack>
                 {loading ? (
                   <View padding={12}>
                     <ActivityIndicator color="#e6b200" />
@@ -198,12 +240,12 @@ const Register = () => {
                   <>
                     <Button
                       mt={'8'}
-                      isDisabled={!isValid || loading}
+                      isDisabled={!isValid || loading || !checked}
                       onPress={handleSubmit}
                       borderRadius={metric.buttonRadius}>
                       Register
                     </Button>
-                    <HStack
+                    {/* <HStack
                       mt={4}
                       space={6}
                       overflow="hidden"
@@ -215,7 +257,7 @@ const Register = () => {
                       </Text>
                       <Divider />
                     </HStack>
-                    <SocialLogin />
+                    <SocialLogin /> */}
                   </>
                 )}
               </Stack>
