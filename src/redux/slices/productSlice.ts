@@ -4,7 +4,7 @@ import {
   getBookings,
   getInvoice,
   getLatestBookingReview,
-  getPlans,  
+  getPlans,
   getReviewDataDetail,
   getReviewQuestion,
   getSubscriptions,
@@ -176,57 +176,6 @@ const bookings = createAsyncThunk(
       return response?.data;
     } catch (error) {
       return rejectWithValue(error?.message || error);
-    }
-  },
-);
-
-const reviewQuestions = createAsyncThunk(
-  joinWithSlash(CLIENT, 'reviewQuestion'),
-  async (_, {rejectWithValue}) => {
-    try {
-      const response = await getReviewQuestion();
-      console.log('reviewQuestion', response);
-      return response?.data;
-    } catch (error) {
-      return rejectWithValue(error?.message || error);
-    }
-  },
-);
-
-const getReviewData = createAsyncThunk(
-  joinWithSlash(CLIENT, 'getReviewData'),
-  async (params) => {
-    try {
-      const response = await getReviewDataDetail(params);
-      return response?.data;
-    } catch (error) {
-      console.log('Error', error);
-    }
-  },
-);
-
-const latestBookingReview = createAsyncThunk(
-  joinWithSlash(CLIENT, 'latestBookingReview'),
-  async (_, {rejectWithValue}) => {
-    try {
-      const response = await getLatestBookingReview();
-      console.log('lastestBooking', JSON.stringify(response));
-      return response?.data;
-    } catch (error) {
-      return rejectWithValue(error?.message || error);
-    }
-  },
-);
-
-const submitReviewQuestions = createAsyncThunk(
-  joinWithSlash(CLIENT, 'submitReviewQuestion'),
-  async (payload, {rejectWithValue}) => {
-    try {
-      const response = await reviewSubmit(payload);
-      console.log('reviewQuestionData', JSON.stringify(response));
-    } catch (error: any) {
-      console.log('Error', error);
-      return rejectWithValue('Something went wrong. Please try again');
     }
   },
 );

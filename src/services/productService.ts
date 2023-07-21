@@ -3,19 +3,23 @@ import axios from '@whenly/utils/axios-local';
 import qs from 'querystring';
 
 export const getPlans = (params: any) =>
-  axios.get(
-    `/v1/plans?${qs.stringify({...params, visible: 'yes', status: 'active'})}`,
-  );
+  // axios.get(
+  //   `/v1/plans?${qs.stringify({...params, visible: 'yes', status: 'active'})}`,
+  // );
+  axios.get(`/v1/plans?createdBy=${params?.createdBy}&status=active`);
 
 export const getPlan = (planId: string) => axios.get(`/v1/plans/${planId}`);
 
 export const getClasses = (params: any) =>
+  // axios.get(
+  //   `/v1/classes?${qs.stringify({
+  //     ...params,
+  //     visible: 'yes',
+  //     status: 'active',
+  //   })}`,
+  // );
   axios.get(
-    `/v1/classes?${qs.stringify({
-      ...params,
-      visible: 'yes',
-      status: 'active',
-    })}`,
+    `/v1/classes?createdBy=${params?.createdBy}&date=${params?.date}&status=active`,
   );
 
 export const getClass = (classId: string) =>
