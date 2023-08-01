@@ -60,7 +60,6 @@ const PaymentWebview = (props) => {
           status,
           subscription,
         };
-
         if (['paid'].includes(status)) {
           const response = await appDispatch(classActions.book(payload));
           if (response.type.includes('fulfilled')) {

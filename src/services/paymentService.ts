@@ -1,8 +1,17 @@
-import {ENVIRONMENT, DRAGON_PAY_TOKEN, XENDIT_SECRET_KEY} from '@env';
+import {
+  ENVIRONMENT,
+  DRAGON_PAY_TOKEN,
+  XENDIT_SECRET_KEY,
+  SECRET_KEY,
+} from '@env';
 import Axios from 'axios';
 import axios from '@whenly/utils/axios-local';
 import {omit} from 'ramda';
 import {normalizePhoneNumber} from '@whenly/utils/numbers';
+
+const StripeInstance = Axios.create({
+  baseURL: 'https://api.stripe.com/v1/',
+});
 
 const dragonPayInstance = Axios.create({
   baseURL:
@@ -42,6 +51,34 @@ export const createXenditInvoice = (payload: any) => {
   };
 
   return axios.post('/v1/payments/xendit/create-invoice', updatedPayload);
+};
+
+export const createStripeCustomer = (payload: any) => {
+  return StripeInstance.post('customers', payload?.email, {
+    headers: {Authorization: `Bearer ${payload.secreate_stripe_key}`},
+  });
+};
+
+export const createEphemeralKeyCall = (payload: any) => {
+  return StripeInstance.post('ephemeral_keys', payload, {
+    headers: {
+      'Stripe-Version': '2022-11-15',
+      Authorization: `Bearer ${SECRET_KEY}`,
+    },
+  });
+};
+
+export const createPaymentIntentsCall = (payload: any) => {
+  return StripeInstance.post('payment_intents', payload, {
+    headers: {
+      'Stripe-Version': '2022-11-15',
+      Authorization: `Bearer ${SECRET_KEY}`,
+    },
+  });
+};
+
+export const createPaymentApiCall = (payload: any) => {
+  return axios.post('/v1/payments/payment-intent', payload);
 };
 
 export const requestPayment = ({txnId, ...rest}: RequestPaymentPayload) =>

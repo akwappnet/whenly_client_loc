@@ -1,4 +1,4 @@
-import {VStack} from 'native-base';
+import {VStack, View} from 'native-base';
 import React, {useEffect, useState} from 'react';
 import {
   ClassData,
@@ -62,7 +62,7 @@ const MerchantClasses = ({merchant}: ClassesProps) => {
         onDateSelected={(date) => setSelectedDate(date.toDate())}
       />
       {classes.length ? (
-        <>
+        <View style={{marginBottom: 55}}>
           {filteredClasses.length ? (
             filteredClasses.map((c: ClassData) => {
               return <MerchantClassItem key={c._id} classData={c} />;
@@ -72,7 +72,7 @@ const MerchantClasses = ({merchant}: ClassesProps) => {
               message={`This merchant doesn't have classes on this date. \nTry a different day.`}
             />
           )}
-        </>
+        </View>
       ) : (
         <EmptyListMessage
           message={`This merchant doesn't offer classes yet. \nCheck back soon!`}

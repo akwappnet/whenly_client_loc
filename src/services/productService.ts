@@ -42,7 +42,9 @@ export const bookClass = (payload: {
   transactionId: string;
   status: string;
   subscription: string;
-}) => axios.post('/v1/clients/book', {via: 'mobile', ...payload});
+}) => {
+  return axios.post('/v1/clients/book', {via: 'mobile', ...payload});
+};
 
 export const cancelClass = (classId: string) =>
   axios.delete(`/v1/booking/${classId}`);

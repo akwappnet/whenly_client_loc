@@ -116,7 +116,6 @@ const book = createAsyncThunk(
   ) => {
     try {
       const {class: classState} = getState();
-
       console.log('book class details', classState);
       const response = await bookClass({
         classId: classState.class._id,

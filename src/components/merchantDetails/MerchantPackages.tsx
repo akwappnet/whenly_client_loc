@@ -1,4 +1,4 @@
-import {VStack} from 'native-base';
+import {VStack, View} from 'native-base';
 import React, {useEffect} from 'react';
 import {
   Plan,
@@ -24,17 +24,19 @@ export default function MerchantPackages({plans}: PackagesProps) {
 
   return (
     <VStack>
-      {plans.length ? (
-        plans.map((plan: Plan) => {
-          return <MerchantPackageItem planData={plan} key={plan._id} />;
-        })
-      ) : (
-        <EmptyListMessage
-          message={
-            "This merchant doesn't have available plans yet. Check back soon!"
-          }
-        />
-      )}
+      <View style={{marginBottom: 55}}>
+        {plans.length ? (
+          plans.map((plan: Plan) => {
+            return <MerchantPackageItem planData={plan} key={plan._id} />;
+          })
+        ) : (
+          <EmptyListMessage
+            message={
+              "This merchant doesn't have available plans yet. Check back soon!"
+            }
+          />
+        )}
+      </View>
     </VStack>
   );
 }

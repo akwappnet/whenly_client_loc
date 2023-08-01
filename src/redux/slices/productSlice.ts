@@ -12,6 +12,10 @@ import {
   RequestPaymentPayload,
   reviewSubmit,
   createXenditInvoice as createXenditInvoiceAPI,
+  createStripeCustomer,
+  createEphemeralKeyCall,
+  createPaymentIntentsCall,
+  createPaymentApiCall,
 } from '@whenly/services';
 import {joinWithSlash} from '@whenly/utils/string';
 
@@ -129,6 +133,57 @@ const createXenditInvoice = createAsyncThunk(
   },
 );
 
+const createCustomerApi = createAsyncThunk(
+  joinWithSlash(PRODUCT, 'stripe'),
+  async (payload: any, {rejectWithValue}) => {
+    try {
+      const response = await createStripeCustomer(payload);
+      // console.log('createXenditInvoice', response);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.message || error);
+    }
+  },
+);
+
+const createEphemeralKey = createAsyncThunk(
+  joinWithSlash(PRODUCT, 'stripeTwo'),
+  async (payload: any, {rejectWithValue}) => {
+    try {
+      const response = await createEphemeralKeyCall(payload);
+      // console.log('createXenditInvoice', response);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.message || error);
+    }
+  },
+);
+
+const createPaymentIntents = createAsyncThunk(
+  joinWithSlash(PRODUCT, 'stripeThree'),
+  async (payload: any, {rejectWithValue}) => {
+    try {
+      const response = await createPaymentIntentsCall(payload);
+      // console.log('createXenditInvoice', response);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.message || error);
+    }
+  },
+);
+
+const createPayment = createAsyncThunk(
+  joinWithSlash(PRODUCT, 'payment'),
+  async (payload: any, {rejectWithValue}) => {
+    try {
+      const response = await createPaymentApiCall(payload);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.message || error);
+    }
+  },
+);
+
 const getDragonPayToken = createAsyncThunk(
   joinWithSlash(PRODUCT, 'dragonpay-token'),
   async (payload: RequestPaymentPayload, {rejectWithValue}) => {
@@ -161,7 +216,6 @@ const subscriptions = createAsyncThunk(
   async (_, {rejectWithValue}) => {
     try {
       const response = await getSubscriptions();
-
       return response?.data;
     } catch (error) {
       return rejectWithValue(error?.message || error);
@@ -257,6 +311,55 @@ const {actions, reducer} = createSlice({
       state.loading = false;
       state.error = '';
     },
+    [createCustomerApi.pending.type]: (state, {payload}) => {
+      state.loading = true;
+      state.error = '';
+    },
+    [createCustomerApi.rejected.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = payload;
+    },
+    [createCustomerApi.fulfilled.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = '';
+    },
+    [createEphemeralKey.pending.type]: (state, {payload}) => {
+      state.loading = true;
+      state.error = '';
+    },
+    [createEphemeralKey.rejected.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = payload;
+    },
+    [createEphemeralKey.fulfilled.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = '';
+    },
+    [createPaymentIntents.pending.type]: (state, {payload}) => {
+      state.loading = true;
+      state.error = '';
+    },
+    [createPaymentIntents.rejected.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = payload;
+    },
+    [createPaymentIntents.fulfilled.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = '';
+    },
+    [createPayment.pending.type]: (state, {payload}) => {
+      state.loading = true;
+      state.error = '';
+    },
+    [createPayment.rejected.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = payload;
+    },
+    [createPayment.fulfilled.type]: (state, {payload}) => {
+      state.loading = false;
+      state.error = '';
+    },
+
     [invoice.pending.type]: (state, {payload}) => {
       state.loading = true;
       state.error = '';
@@ -333,6 +436,10 @@ export const productActions = {
   latestBookingReview,
   getDragonPayToken,
   createXenditInvoice,
+  createCustomerApi,
+  createEphemeralKey,
+  createPaymentIntents,
+  createPayment,
 };
 
 export default reducer;
