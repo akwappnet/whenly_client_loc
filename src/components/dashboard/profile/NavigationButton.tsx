@@ -14,7 +14,7 @@ interface NavigationButtonProps {
 export default function NavigationButton(props: NavigationButtonProps) {
   const getIconName = () => {
     switch (props.name) {
-      case 'Schedule':
+      case 'Appointments':
         return <Ionicon size={30} name="clipboard-outline" />;
       case 'Passes':
         return <Feather size={30} name="calendar" />;

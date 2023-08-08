@@ -49,9 +49,9 @@ const ClassList = () => {
 
   return (
     <Flex justifyContent="space-between" flexDirection="column">
-      <Box p="20px">
+      {/* <Box p="20px">
         <Heading size="xs">Find appointments, classes, and communities</Heading>
-      </Box>
+      </Box> */}
       {loading ? (
         <Center width="100%" height="100%" py="8px">
           <Spinner accessibilityLabel="Loading products" />

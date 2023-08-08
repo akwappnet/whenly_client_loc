@@ -73,7 +73,7 @@ const MerchantDetailsScreen = (props) => {
   useFocusEffect(
     useCallback(() => {
       if (from === 'success' && type === 'plan') {
-        setActiveTab(2);
+        setActiveTab(1);
       }
     }, [from, type]),
   );
@@ -82,9 +82,9 @@ const MerchantDetailsScreen = (props) => {
     switch (activeTab) {
       case 0:
         return <AboutMerchant merchant={merchant?._id} user={user} />;
+      // case 1:
+      //   return <MerchantPackages plans={docs} />;
       case 1:
-        return <MerchantPackages plans={docs} />;
-      case 2:
         return <MerchantClasses merchant={merchant} classes={classes} />;
       default:
         return <AboutMerchant merchant={merchant} />;
@@ -224,7 +224,7 @@ const MerchantDetailsScreen = (props) => {
                   color={activeTab === 0 ? 'primary.400' : 'gray.300'}>
                   About
                 </Button>
-                <Button
+                {/* <Button
                   onPress={() => setActiveTab(1)}
                   variant="outline"
                   size="xs"
@@ -233,15 +233,15 @@ const MerchantDetailsScreen = (props) => {
                   borderColor={activeTab === 1 ? 'primary.400' : 'gray.300'}
                   color={activeTab === 1 ? 'primary.400' : 'gray.300'}>
                   Packages
-                </Button>
+                </Button> */}
                 <Button
-                  onPress={() => setActiveTab(2)}
+                  onPress={() => setActiveTab(1)}
                   variant="outline"
                   size="xs"
                   borderRadius="2xl"
                   flex={1}
-                  borderColor={activeTab === 2 ? 'primary.400' : 'gray.300'}
-                  color={activeTab === 2 ? 'primary.400' : 'gray.300'}>
+                  borderColor={activeTab === 1 ? 'primary.400' : 'gray.300'}
+                  color={activeTab === 1 ? 'primary.400' : 'gray.300'}>
                   Classes
                 </Button>
               </HStack>

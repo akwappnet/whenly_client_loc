@@ -10,9 +10,9 @@ const Featured = () => {
 
   const items = useMemo(() => {
     return [
-      require('../../../assets/images/banner/1.png'),
+      require('../../../assets/images/banner/1v2.png'),
       require('../../../assets/images/banner/2.png'),
-      require('../../../assets/images/banner/3.png'),
+      require('../../../assets/images/banner/3v2.png'),
     ];
   }, []);
 
@@ -23,21 +23,26 @@ const Featured = () => {
         alt="featured banner photo"
         height={(metric.fullWidth * 9) / 16}
         width={metric.fullWidth}
-        style={{borderRadius: 8}}
+        // style={{borderRadius: 8}}
         resizeMode="cover"
       />
     );
   };
 
   return (
-    <Carousel
-      data={items}
-      renderItem={_renderItem}
-      sliderWidth={sliderWidth}
-      loop
-      autoplay
-      autoplayInterval={5000} // 5 sec per image
-      itemWidth={itemWidth - 80}
+    // <Carousel
+    //   data={items}
+    //   renderItem={_renderItem}
+    //   sliderWidth={sliderWidth}
+    //   loop
+    //   autoplay
+    //   autoplayInterval={5000} // 5 sec per image
+    //   itemWidth={itemWidth}
+    // />
+    // Single image full banner
+    <Image
+      source={require('../../../assets/images/banner/1v2.png')}
+      style={{width: metric.fullWidth, height: (metric.fullWidth * 9) / 16}}
     />
   );
 };

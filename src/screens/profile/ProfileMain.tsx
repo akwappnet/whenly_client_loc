@@ -52,17 +52,17 @@ const ProfileMain = (props: any) => {
         </Center>
         <HStack alignItems={'stretch'} space={8} justifyContent="center" my={6}>
           <NavigationButton
-            name="Schedule"
+            name="Appointments"
             onPress={() => {
               props.navigation.push('Schedule');
             }}
           />
-          <NavigationButton
+          {/* <NavigationButton
             name="Passes"
             onPress={() => {
               props.navigation.push('Passes');
             }}
-          />
+          /> */}
           {/* <NavigationButton
             name="Activity"
             onPress={() => {

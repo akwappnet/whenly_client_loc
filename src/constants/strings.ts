@@ -35,3 +35,11 @@ export const PAYMENT_OPTIONS = [
     value: 'GCSB',
   },
 ];
+
+export const COLOR_PALETTE = [
+  '#E97311',
+  '#F28F14',
+  '#F3AC19',
+  '#EDC814',
+  '#EBDC0C',
+];

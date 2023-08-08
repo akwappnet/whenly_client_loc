@@ -246,31 +246,6 @@ const AboutMerchant = ({user}: AboutMerchantProps) => {
         <Collapse
           header={
             <Box>
-              <Text fontWeight="bold">Contact</Text>
-            </Box>
-          }
-          content={
-            <Box py={2}>
-              {Object.keys(contactDetails).map((social: string) =>
-                !!contactDetails[social] ? (
-                  <Box
-                    key={social}
-                    flexDirection="row"
-                    justifyContent="space-between"
-                    my={1}>
-                    <Text {...contactLabelStyles}>
-                      {capitalizeFirstLetter(social)}
-                    </Text>
-                    <Text {...contactStyles}>{contactDetails[social]}</Text>
-                  </Box>
-                ) : null,
-              )}
-            </Box>
-          }
-        />
-        <Collapse
-          header={
-            <Box>
               <Text fontWeight="bold">Review</Text>
             </Box>
           }
